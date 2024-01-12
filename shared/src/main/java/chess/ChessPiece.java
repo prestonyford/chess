@@ -69,8 +69,12 @@ public class ChessPiece {
                         {myPosition.getRow() - 1, myPosition.getColumn()},
                         {myPosition.getRow() - 1, myPosition.getColumn() + 1}
                 }) {
+                    ChessPosition endPosition = new ChessPosition(move[0], move[1]);
                     if (ChessBoard.validTile(move[0], move[1])) {
-                        ChessPosition endPosition = new ChessPosition(move[0], move[1]);
+                        // Cannot move to ally position
+                        if (board.getPiece(endPosition) != null && board.getPiece(endPosition).getTeamColor() == this.pieceColor) {
+                            continue;
+                        }
                         moves.add(new ChessMove(myPosition, endPosition, null));
                     }
                 }
