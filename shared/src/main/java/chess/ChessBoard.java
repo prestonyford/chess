@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -22,7 +23,6 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        // throw new RuntimeException("Not implemented");
         this.board[8 - position.getRow()][position.getColumn() - 1] = piece;
     }
 
@@ -34,7 +34,6 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        // throw new RuntimeException("Not implemented");
         return this.board[8 - position.getRow()][position.getColumn() - 1];
     }
 
@@ -43,16 +42,55 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        // Fill pawns
+        for (int col = 1; col <= 8; ++col) {
+            addPiece(new ChessPosition(2,col), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(7,col), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+        }
+
+        int col = 1;
+        for (var piece: new ChessPiece.PieceType[]{
+                ChessPiece.PieceType.ROOK,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.BISHOP,
+                ChessPiece.PieceType.QUEEN,
+                ChessPiece.PieceType.KING,
+                ChessPiece.PieceType.BISHOP,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.ROOK
+        }) {
+            addPiece(new ChessPosition(1,col), new ChessPiece(ChessGame.TeamColor.WHITE, piece));
+            addPiece(new ChessPosition(8,col), new ChessPiece(ChessGame.TeamColor.BLACK, piece));
+            ++col;
+        }
     }
 
-
-    /**
-     * HELPERS
-     */
+    // HELPER
     public static boolean validTile(ChessPosition pos) {
         int row = pos.getRow();
         int col = pos.getColumn();
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessBoard that = (ChessBoard) o;
+        return Arrays.deepEquals(board, that.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(board);
+    }
+
+    @Override
+    public String toString() {
+        var sb = new StringBuilder();
+        for (ChessPiece[] row: board) {
+            sb.append(Arrays.toString(row));
+        }
+        return sb.toString();
     }
 }
