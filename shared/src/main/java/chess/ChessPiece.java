@@ -56,21 +56,21 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         HashSet<ChessMove> moves = new HashSet<ChessMove>();
 
-        // TODO: Determine promotion piece; currently hardcoded as PAWN
-        PieceType promotionPiece = PieceType.PAWN;
+        // TODO: Determine promotion piece; currently hardcoded as null
+        PieceType promotionPiece = null;
         switch (this.type) {
             case KING:
                 // TODO: A player is not allowed to make any move that would allow the opponent to capture their King. If your King is in danger of being captured on your turn, you must make a move that removes your King from immediate danger.
                 for (var move: new int[][]{
-                    {myPosition.getRow() + 1, myPosition.getColumn() - 1},
-                    {myPosition.getRow() + 1, myPosition.getColumn()},
-                    {myPosition.getRow() + 1, myPosition.getColumn() + 1},
-                    {myPosition.getRow(), myPosition.getColumn() - 1},
-                    {myPosition.getRow(), myPosition.getColumn()},
-                    {myPosition.getRow(), myPosition.getColumn() + 1},
-                    {myPosition.getRow() - 1, myPosition.getColumn() - 1},
-                    {myPosition.getRow() - 1, myPosition.getColumn()},
-                    {myPosition.getRow() - 1, myPosition.getColumn() + 1},
+                        {myPosition.getRow() + 1, myPosition.getColumn() - 1},
+                        {myPosition.getRow() + 1, myPosition.getColumn()},
+                        {myPosition.getRow() + 1, myPosition.getColumn() + 1},
+                        {myPosition.getRow(), myPosition.getColumn() - 1},
+                        {myPosition.getRow(), myPosition.getColumn()},
+                        {myPosition.getRow(), myPosition.getColumn() + 1},
+                        {myPosition.getRow() - 1, myPosition.getColumn() - 1},
+                        {myPosition.getRow() - 1, myPosition.getColumn()},
+                        {myPosition.getRow() - 1, myPosition.getColumn() + 1}
                 }) {
                     if (ChessBoard.validTile(move[0], move[1])) {
                         ChessPosition endPosition = new ChessPosition(move[0], move[1]);
@@ -81,6 +81,21 @@ public class ChessPiece {
             case QUEEN:
                 break;
             case BISHOP:
+                for (var direction: new int[][]{
+                        {1, -1},
+                        {1, 1},
+                        {-1, -1},
+                        {-1, 1}
+                }) {
+                    int row = myPosition.getRow() + direction[0];
+                    int col = myPosition.getColumn() + direction[1];
+                    while (ChessBoard.validTile(row, col)) {
+                        ChessPosition endPosition = new ChessPosition(row, col);
+                        moves.add(new ChessMove(myPosition, endPosition, promotionPiece));
+                        row += direction[0];
+                        col += direction[1];
+                    }
+                }
                 break;
             case KNIGHT:
                 break;
