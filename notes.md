@@ -1,3 +1,3 @@
 # Phase notes
 ## Phase 0
-- ChessPosition and ChessPiece should have equals() and hashCode()
+- ChessPosition and ChessMove should have equals() and hashCode()

@@ -50,7 +50,9 @@ public class ChessBoard {
     /**
      * HELPERS
      */
-    public static boolean validTile(int row, int col) {
+    public static boolean validTile(ChessPosition pos) {
+        int row = pos.getRow();
+        int col = pos.getColumn();
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
 }
