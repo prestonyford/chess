@@ -91,9 +91,20 @@ public class ChessPiece {
                     int col = myPosition.getColumn() + direction[1];
                     while (ChessBoard.validTile(row, col)) {
                         ChessPosition endPosition = new ChessPosition(row, col);
+
+                        // If spot taken by ally, do not add and stop adding that direction to moves
+                        if (board.getPiece(endPosition) != null && board.getPiece(endPosition).getTeamColor() == this.pieceColor) {
+                            break;
+                        }
+
                         moves.add(new ChessMove(myPosition, endPosition, promotionPiece));
                         row += direction[0];
                         col += direction[1];
+
+                        // If spot is an enemy, capture and stop adding that direction to moves
+                        if (board.getPiece(endPosition) != null) {
+                            break;
+                        }
                     }
                 }
                 break;
