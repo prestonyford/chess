@@ -45,4 +45,12 @@ public class ChessBoard {
     public void resetBoard() {
         throw new RuntimeException("Not implemented");
     }
+
+
+    /**
+     * HELPERS
+     */
+    public static boolean validTile(int row, int col) {
+        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
+    }
 }
