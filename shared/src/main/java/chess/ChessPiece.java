@@ -124,6 +124,14 @@ public class ChessPiece {
                 }
                 break;
             case ROOK:
+                for (var direction: new int[][]{
+                        {1, 0},
+                        {0, -1},
+                        {0, 1},
+                        {-1, 0},
+                }) {
+                    moves.addAll(findMovesInDirection(board, myPosition, direction));
+                }
                 break;
             case PAWN:
                 if (this.pieceColor == ChessGame.TeamColor.WHITE) {
