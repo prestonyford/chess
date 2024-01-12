@@ -107,6 +107,25 @@ public class ChessPiece {
                 }
                 break;
             case KNIGHT:
+                for (var move: new int[][]{
+                        {myPosition.getRow() + 2, myPosition.getColumn() - 1},
+                        {myPosition.getRow() + 2, myPosition.getColumn() + 1},
+                        {myPosition.getRow() + 1, myPosition.getColumn() - 2},
+                        {myPosition.getRow() + 1, myPosition.getColumn() + 2},
+                        {myPosition.getRow() - 1, myPosition.getColumn() - 2},
+                        {myPosition.getRow() - 1, myPosition.getColumn() + 2},
+                        {myPosition.getRow() - 2, myPosition.getColumn() - 1},
+                        {myPosition.getRow() - 2, myPosition.getColumn() + 1}
+                }) {
+                    ChessPosition endPosition = new ChessPosition(move[0], move[1]);
+                    if (ChessBoard.validTile(move[0], move[1])) {
+                        // Cannot move to ally position
+                        if (board.getPiece(endPosition) != null && board.getPiece(endPosition).getTeamColor() == this.pieceColor) {
+                            continue;
+                        }
+                        moves.add(new ChessMove(myPosition, endPosition, null));
+                    }
+                }
                 break;
             case ROOK:
                 break;
