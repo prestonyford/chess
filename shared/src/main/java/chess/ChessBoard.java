@@ -63,6 +63,13 @@ public class ChessBoard {
             addPiece(new ChessPosition(8,col), new ChessPiece(ChessGame.TeamColor.BLACK, piece));
             ++col;
         }
+
+        // All other tiles null, just in case
+        for (int row = 3; row <= 6; ++row) {
+            for (col = 1; col <= 8; ++col) {
+                addPiece(new ChessPosition(row, col), null);
+            }
+        }
     }
 
     // HELPER
