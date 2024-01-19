@@ -11,8 +11,6 @@ import java.util.Collection;
 public class ChessGame {
     private ChessBoard chessBoard;
     private TeamColor teamTurn;
-    private boolean whiteKingInCheck;
-    private boolean blackKingInCheck;
 
     public ChessGame() {
 
@@ -120,11 +118,15 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        if (teamColor == TeamColor.WHITE) {
-            return whiteKingInCheck;
-        }
-        else {
-            return blackKingInCheck;
+        for (int row = 1; row <= 8; ++row) {
+            for (int col = 1; col <= 8; ++col) {
+                ChessPosition pos = new ChessPosition(row, col);
+                Collection<ChessMove> pieceMoves = validMoves(pos);
+                if (pieceMoves == null) {
+                    continue;
+                }
+
+            }
         }
     }
 
