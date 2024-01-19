@@ -125,13 +125,16 @@ public class ChessGame {
                 if (pieceMoves == null) {
                     continue;
                 }
+                TeamColor pieceColor = chessBoard.getPiece(startPosition).getTeamColor();
+
                 for (ChessMove move: pieceMoves) {
                     ChessPosition endPosition = move.getEndPosition();
                     ChessPiece targetPiece = chessBoard.getPiece(endPosition);
                     if (
                             targetPiece != null &&
                             targetPiece.getPieceType() == ChessPiece.PieceType.KING &&
-                            targetPiece.getTeamColor() != teamColor
+                            targetPiece.getTeamColor() != pieceColor &&
+                            targetPiece.getTeamColor() == teamColor
                     ) {
                         return true;
                     }
