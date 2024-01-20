@@ -70,7 +70,7 @@ public class ChessGame {
                 moves != null && moves.contains(move) &&
                 piece.getTeamColor() == this.teamTurn
         ) {
-            // Make the move
+            // Make the move but don't promote yet
             ChessPosition endPosition = move.getEndPosition();
             ChessPiece pieceAtEndPosition = chessBoard.getPiece(endPosition);
             chessBoard.addPiece(startPosition, null);
@@ -81,6 +81,11 @@ public class ChessGame {
                 chessBoard.addPiece(startPosition, piece);
                 chessBoard.addPiece(endPosition, pieceAtEndPosition);
                 throw new InvalidMoveException();
+            }
+
+            // If the move was kept (not reverted), check for promotion and promote accordingly
+            else if (move.getPromotionPiece() != null) {
+                chessBoard.addPiece(endPosition, new ChessPiece(this.teamTurn, move.getPromotionPiece()));
             }
 
             // Swap team color
@@ -180,7 +185,19 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        for (int row = 1; row <= 8; ++row) {
+            for (int col = 1; col <= 8; ++col) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = chessBoard.getPiece(position);
+                if (piece == null || piece.getTeamColor() != teamColor) {
+                    continue;
+                }
+                if (!validMoves(position).isEmpty()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
