@@ -72,8 +72,16 @@ public class ChessGame {
         ) {
             // Make the move
             ChessPosition endPosition = move.getEndPosition();
+            ChessPiece pieceAtEndPosition = chessBoard.getPiece(endPosition);
             chessBoard.addPiece(startPosition, null);
             chessBoard.addPiece(endPosition, piece);
+
+            // If now in check, revert move and throw illegal move. Icky I know but I can't change function signature
+            if (isInCheck(this.teamTurn)) {
+                chessBoard.addPiece(startPosition, piece);
+                chessBoard.addPiece(endPosition, pieceAtEndPosition);
+                throw new InvalidMoveException();
+            }
 
             // Swap team color
             if (this.teamTurn == TeamColor.WHITE) {
@@ -88,28 +96,6 @@ public class ChessGame {
             throw new InvalidMoveException();
         }
     }
-
-//    private void checkIfPieceChecks(ChessPosition position) {
-//        Collection<ChessMove> newMoves = validMoves(position);
-//        if (newMoves == null) {
-//            return;
-//        }
-//        for (ChessMove newMove: newMoves) {
-//            ChessPiece targetPiece = chessBoard.getPiece(newMove.getEndPosition());
-//            if (
-//                    targetPiece != null &&
-//                    targetPiece.getPieceType() == ChessPiece.PieceType.KING &&
-//                    targetPiece.getTeamColor() != this.teamTurn
-//            ) {
-//                if (this.teamTurn == TeamColor.WHITE) {
-//                    blackKingInCheck = true;
-//                }
-//                else {
-//                    whiteKingInCheck = true;
-//                }
-//            }
-//        }
-//    }
 
     /**
      * Determines if the given team is in check
