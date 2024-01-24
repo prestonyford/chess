@@ -16,6 +16,11 @@ public class ChessGame {
 
     }
 
+    public ChessGame(ChessGame other) {
+        chessBoard = new ChessBoard(other.chessBoard);
+        teamTurn = other.teamTurn;
+    }
+
     /**
      * @return Which team's turn it is
      */
@@ -185,6 +190,11 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
+
+        ChessGame copyGame = new ChessGame(this);
         for (int row = 1; row <= 8; ++row) {
             for (int col = 1; col <= 8; ++col) {
                 ChessPosition position = new ChessPosition(row, col);
@@ -192,9 +202,36 @@ public class ChessGame {
                 if (piece == null || piece.getTeamColor() != teamColor) {
                     continue;
                 }
-                if (!validMoves(position).isEmpty()) {
-                    return false;
+                Collection<ChessMove> pieceMoves = validMoves(position);
+                if (pieceMoves == null) {
+                    continue;
                 }
+
+                for (ChessMove move: pieceMoves) {
+                    try {
+                        ChessPiece startPosPiece = copyGame.getBoard().getPiece(move.getStartPosition());
+                        ChessPiece finalPosPiece = copyGame.getBoard().getPiece(move.getEndPosition());
+                        copyGame.makeMove(move);
+                        if (!copyGame.isInCheck(teamColor)) {
+                            return false;
+                        }
+                        // revert move
+                        copyGame.getBoard().addPiece(move.getStartPosition(), startPosPiece);
+                        copyGame.getBoard().addPiece(move.getEndPosition(), finalPosPiece);
+                    }
+                    catch (InvalidMoveException ex) {
+                        continue;
+                    }
+                }
+
+//                if (validMoves(position) == null || piece.getTeamColor() != teamColor) {
+//                    continue;
+//                }
+//
+//                // TODO: Stalemate occurs when there are no legal moves left; note that a move that leaves the king in check is illegal
+//                if (!validMoves(position).isEmpty()) {
+//                    return false;
+//                }
             }
         }
         return true;
