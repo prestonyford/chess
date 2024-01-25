@@ -68,10 +68,6 @@ public class ChessGame {
             ChessPiece startPositionPiece = chessBoard.getPiece(move.getStartPosition());
             ChessPiece endPositionPiece = chessBoard.getPiece(move.getEndPosition());
 
-            if (Objects.equals(move.getEndPosition(), new ChessPosition(8, 4))) {
-                System.out.println("8,4 found");
-            }
-
             // Make the move but don't promote
             chessBoard.addPiece(startPosition, null);
             chessBoard.addPiece(move.getEndPosition(), piece);
