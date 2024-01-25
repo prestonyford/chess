@@ -206,7 +206,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         HashSet<ChessMove> allyMoves = new HashSet<>();
-
+        int numAllies = 0;
         for (int row = 1; row <= 8; ++row) {
             for (int col = 1; col <= 8; ++col) {
                 ChessPosition position = new ChessPosition(row, col);
@@ -215,10 +215,15 @@ public class ChessGame {
                     continue;
                 }
                 Collection<ChessMove> pieceMoves = validMoves(position);
+                ++numAllies;
                 if (pieceMoves != null) {
                     allyMoves.addAll(pieceMoves);
                 }
             }
+        }
+
+        if (!isInCheck(teamColor) && numAllies > 1) {
+            return false;
         }
 
         for (ChessMove move: allyMoves) {
