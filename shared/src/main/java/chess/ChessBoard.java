@@ -19,7 +19,9 @@ public class ChessBoard {
     public ChessBoard(ChessBoard other) {
         for (int row = 0; row < 8; ++row) {
             for (int col = 0; col < 8; ++col) {
-                board[row][col] = new ChessPiece(other.board[row][col]);
+                if (other.board[row][col] != null) {
+                    board[row][col] = new ChessPiece(other.board[row][col]);
+                }
             }
         }
     }

@@ -190,50 +190,48 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        // if the king is already in check, it is in stalemate if there are no moves
+
+        // ChessGame copyGame = new ChessGame(this);
         if (!isInCheck(teamColor)) {
-            return false;
-        }
-
-        ChessGame copyGame = new ChessGame(this);
-        for (int row = 1; row <= 8; ++row) {
-            for (int col = 1; col <= 8; ++col) {
-                ChessPosition position = new ChessPosition(row, col);
-                ChessPiece piece = chessBoard.getPiece(position);
-                if (piece == null || piece.getTeamColor() != teamColor) {
-                    continue;
-                }
-                Collection<ChessMove> pieceMoves = validMoves(position);
-                if (pieceMoves == null) {
-                    continue;
-                }
-
-                for (ChessMove move: pieceMoves) {
-                    try {
-                        ChessPiece startPosPiece = copyGame.getBoard().getPiece(move.getStartPosition());
-                        ChessPiece finalPosPiece = copyGame.getBoard().getPiece(move.getEndPosition());
-                        copyGame.makeMove(move);
-                        if (!copyGame.isInCheck(teamColor)) {
-                            return false;
-                        }
-                        // revert move
-                        copyGame.getBoard().addPiece(move.getStartPosition(), startPosPiece);
-                        copyGame.getBoard().addPiece(move.getEndPosition(), finalPosPiece);
-                    }
-                    catch (InvalidMoveException ex) {
+            for (int row = 1; row <= 8; ++row) {
+                for (int col = 1; col <= 8; ++col) {
+                    ChessPosition position = new ChessPosition(row, col);
+                    ChessPiece piece = chessBoard.getPiece(position);
+                    if (piece == null || piece.getTeamColor() != teamColor) {
                         continue;
                     }
-                }
+                    Collection<ChessMove> pieceMoves = validMoves(position);
+                    if (pieceMoves == null) {
+                        continue;
+                    }
 
-//                if (validMoves(position) == null || piece.getTeamColor() != teamColor) {
-//                    continue;
-//                }
-//
-//                // TODO: Stalemate occurs when there are no legal moves left; note that a move that leaves the king in check is illegal
-//                if (!validMoves(position).isEmpty()) {
-//                    return false;
-//                }
+                    for (ChessMove move: pieceMoves) {
+                        try {
+                            ChessPiece startPosPiece = this.getBoard().getPiece(move.getStartPosition());
+                            ChessPiece finalPosPiece = this.getBoard().getPiece(move.getEndPosition());
+                            this.makeMove(move);
+                            if (!this.isInCheck(teamColor)) {
+                                // revert move
+                                this.getBoard().addPiece(move.getStartPosition(), startPosPiece);
+                                this.getBoard().addPiece(move.getEndPosition(), finalPosPiece);
+                                return false;
+                            }
+                            // revert move
+                            this.getBoard().addPiece(move.getStartPosition(), startPosPiece);
+                            this.getBoard().addPiece(move.getEndPosition(), finalPosPiece);
+                        }
+                        catch (InvalidMoveException ex) {
+                            continue;
+                        }
+                    }
+                }
             }
         }
+        else {
+            System.out.println("here!");
+        }
+
         return true;
     }
 
