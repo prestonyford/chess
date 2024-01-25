@@ -12,10 +12,12 @@ import java.util.Objects;
  */
 public class ChessGame {
     private ChessBoard chessBoard;
-    private TeamColor teamTurn = TeamColor.WHITE;
+    private TeamColor teamTurn;
 
     public ChessGame() {
-
+//        chessBoard = new ChessBoard();
+//        chessBoard.resetBoard();
+//        teamTurn = TeamColor.WHITE;
     }
 
     public ChessGame(ChessGame other) {
@@ -62,24 +64,20 @@ public class ChessGame {
         Collection<ChessMove> moves = piece.pieceMoves(this.chessBoard, startPosition);
         HashSet<ChessMove> legalMoves = new HashSet<>();
 
-//        if (piece.getTeamColor() != teamTurn) {
-//            return legalMoves;
-//        }
-
         for (ChessMove move: moves) {
             ChessPiece startPositionPiece = chessBoard.getPiece(move.getStartPosition());
             ChessPiece endPositionPiece = chessBoard.getPiece(move.getEndPosition());
 
-//            if (Objects.equals(move.getEndPosition(), new ChessPosition(8, 6))) {
-//                System.out.println("8,6 found");
-//            }
+            if (Objects.equals(move.getEndPosition(), new ChessPosition(8, 4))) {
+                System.out.println("8,4 found");
+            }
 
-            // Make the move but don't promote yet
+            // Make the move but don't promote
             chessBoard.addPiece(startPosition, null);
             chessBoard.addPiece(move.getEndPosition(), piece);
 
             // If still not in check, add to legalMoves
-            if (!isInCheck(this.teamTurn)) {
+            if (!isInCheck(piece.getTeamColor())) {
                 legalMoves.add(move);
             }
 
@@ -105,7 +103,7 @@ public class ChessGame {
 
         if (
                 moves != null && moves.contains(move) &&
-                piece.getTeamColor() == this.teamTurn
+                piece.getTeamColor() == teamTurn
         ) {
             chessBoard.addPiece(startPosition, null);
             chessBoard.addPiece(endPosition, piece);
@@ -144,7 +142,6 @@ public class ChessGame {
                     continue;
                 }
                 Collection<ChessMove> pieceMoves = piece.pieceMoves(chessBoard, startPosition);
-
                 TeamColor pieceColor = chessBoard.getPiece(startPosition).getTeamColor();
 
                 for (ChessMove move: pieceMoves) {
@@ -218,7 +215,6 @@ public class ChessGame {
             return false;
         }
 
-        HashSet<ChessMove> allyMoves = new HashSet<>();
         for (int row = 1; row <= 8; ++row) {
             for (int col = 1; col <= 8; ++col) {
                 ChessPosition position = new ChessPosition(row, col);
@@ -227,27 +223,12 @@ public class ChessGame {
                     continue;
                 }
                 Collection<ChessMove> pieceMoves = validMoves(position);
-                if (pieceMoves != null) {
-                    allyMoves.addAll(pieceMoves);
+                if (pieceMoves != null && !pieceMoves.isEmpty()) {
+                    return false;
                 }
             }
         }
 
-        for (ChessMove move: allyMoves) {
-            ChessPiece startPositionPiece = chessBoard.getPiece(move.getStartPosition());
-            ChessPiece endPositionPiece = chessBoard.getPiece(move.getEndPosition());
-            try {
-                this.makeMove(move);
-                // If it made it here it is valid
-                // revert the move if it was legal
-                chessBoard.addPiece(move.getStartPosition(), startPositionPiece);
-                chessBoard.addPiece(move.getEndPosition(), endPositionPiece);
-                return false;
-            }
-            catch (Exception ex) {
-                continue;
-            }
-        }
         return true;
     }
 
