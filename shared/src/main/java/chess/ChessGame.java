@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -11,7 +12,7 @@ import java.util.HashSet;
  */
 public class ChessGame {
     private ChessBoard chessBoard;
-    private TeamColor teamTurn;
+    private TeamColor teamTurn = TeamColor.WHITE;
 
     public ChessGame() {
 
@@ -61,9 +62,17 @@ public class ChessGame {
         Collection<ChessMove> moves = piece.pieceMoves(this.chessBoard, startPosition);
         HashSet<ChessMove> legalMoves = new HashSet<>();
 
+//        if (piece.getTeamColor() != teamTurn) {
+//            return legalMoves;
+//        }
+
         for (ChessMove move: moves) {
             ChessPiece startPositionPiece = chessBoard.getPiece(move.getStartPosition());
             ChessPiece endPositionPiece = chessBoard.getPiece(move.getEndPosition());
+
+//            if (Objects.equals(move.getEndPosition(), new ChessPosition(8, 6))) {
+//                System.out.println("8,6 found");
+//            }
 
             // Make the move but don't promote yet
             chessBoard.addPiece(startPosition, null);
@@ -205,8 +214,6 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-
-
         if (teamTurn != teamColor) {
             return false;
         }
