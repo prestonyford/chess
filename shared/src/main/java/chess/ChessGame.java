@@ -205,8 +205,13 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+
+
+        if (teamTurn != teamColor) {
+            return false;
+        }
+
         HashSet<ChessMove> allyMoves = new HashSet<>();
-        int numAllies = 0;
         for (int row = 1; row <= 8; ++row) {
             for (int col = 1; col <= 8; ++col) {
                 ChessPosition position = new ChessPosition(row, col);
@@ -215,15 +220,10 @@ public class ChessGame {
                     continue;
                 }
                 Collection<ChessMove> pieceMoves = validMoves(position);
-                ++numAllies;
                 if (pieceMoves != null) {
                     allyMoves.addAll(pieceMoves);
                 }
             }
-        }
-
-        if (!isInCheck(teamColor) && numAllies > 1) {
-            return false;
         }
 
         for (ChessMove move: allyMoves) {
