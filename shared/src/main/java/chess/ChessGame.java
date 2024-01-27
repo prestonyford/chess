@@ -21,6 +21,10 @@ public class ChessGame {
     private boolean blackLeftRookHasMoved = false;
     private boolean blackRightRookHasMoved = false;
 
+    // En Passant
+    private ChessPosition lastWhitePawnToDoubleMove = null;
+    private ChessPosition lastBlackPawnToDoubleMove = null;
+
     public ChessGame() {
 //        chessBoard = new ChessBoard();
 //        chessBoard.resetBoard();
@@ -152,6 +156,43 @@ public class ChessGame {
                 }
             }
         }
+
+        // En Passant
+        // If sideways neighbor is enemy pawn
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            ChessPosition toLeft = new ChessPosition(startPosition.getRow(), startPosition.getColumn() - 1);
+            ChessPosition toRight = new ChessPosition(startPosition.getRow(), startPosition.getColumn() + 1);
+
+            if (piece.getTeamColor() == TeamColor.WHITE) {
+                if (toLeft.equals(lastBlackPawnToDoubleMove)) {
+                    // Diagonal Left
+                    ChessPosition endPosition = new ChessPosition(lastBlackPawnToDoubleMove.getRow() + 1, lastBlackPawnToDoubleMove.getColumn());
+                    ChessMove move = new ChessMove(startPosition, endPosition, null);
+                    legalMoves.add(move);
+                }
+                else if (toRight.equals(lastBlackPawnToDoubleMove)) {
+                    // Diagonal Right
+                    ChessPosition endPosition = new ChessPosition(lastBlackPawnToDoubleMove.getRow() + 1, lastBlackPawnToDoubleMove.getColumn());
+                    ChessMove move = new ChessMove(startPosition, endPosition, null);
+                    legalMoves.add(move);
+                }
+            }
+            else {
+                if (toLeft.equals(lastWhitePawnToDoubleMove)) {
+                    // Diagonal Left
+                    ChessPosition endPosition = new ChessPosition(lastWhitePawnToDoubleMove.getRow() - 1, lastWhitePawnToDoubleMove.getColumn());
+                    ChessMove move = new ChessMove(startPosition, endPosition, null);
+                    legalMoves.add(move);
+                }
+                else if (toRight.equals(lastWhitePawnToDoubleMove)) {
+                    // Diagonal Right
+                    ChessPosition endPosition = new ChessPosition(lastWhitePawnToDoubleMove.getRow() - 1, lastWhitePawnToDoubleMove.getColumn());
+                    ChessMove move = new ChessMove(startPosition, endPosition, null);
+                    legalMoves.add(move);
+                }
+            }
+        }
+
         return legalMoves;
     }
 
@@ -175,8 +216,11 @@ public class ChessGame {
             throw new InvalidMoveException();
         }
 
-        chessBoard.movePiece(move);
+        // Reset En Passant checks
+        lastWhitePawnToDoubleMove = null;
+        lastBlackPawnToDoubleMove = null;
 
+        // Castling
         // Update castling checks or castle if it was a king
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
             if (piece.getTeamColor() == TeamColor.WHITE) {
@@ -229,6 +273,34 @@ public class ChessGame {
                 }
             }
         }
+
+        // En Passant checks
+        else if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            // If double moved, next turn enemy can en Passant
+            if (Math.abs(endPosition.getRow() - startPosition.getRow()) == 2) {
+                if (piece.getTeamColor() == TeamColor.WHITE) {
+                    lastWhitePawnToDoubleMove = endPosition;
+                }
+                else {
+                    lastBlackPawnToDoubleMove = endPosition;
+                }
+            }
+
+            // If move itself is en passant, remove enemy Pawn
+            // If it is a diagonal move but there is no enemy piece at the diagonal, it must be En Passant
+            // All horizontal moves made by a pawn are guaranteed to also be diagonal
+            if (endPosition.getColumn() - startPosition.getColumn() != 0) {
+                if (chessBoard.getPiece(endPosition) == null) {
+                    // It must be en passant
+                    int direction = piece.getTeamColor() == TeamColor.WHITE ? 1 : -1;
+                    ChessPosition pawnToRemovePos = new ChessPosition(endPosition.getRow() - direction, endPosition.getColumn());
+                    chessBoard.addPiece(pawnToRemovePos, null);
+                }
+            }
+        }
+
+        // Move piece
+        chessBoard.movePiece(move);
 
         // Swap team color
         if (this.teamTurn == TeamColor.WHITE) {
