@@ -2,7 +2,6 @@ package chess;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -71,21 +70,21 @@ public class ChessGame {
         }
         Collection<ChessMove> moves = piece.pieceMoves(this.chessBoard, startPosition);
         HashSet<ChessMove> legalMoves = new HashSet<>();
+        TeamColor pieceColor = piece.getTeamColor();
 
         for (ChessMove move: moves) {
             ChessPiece startPositionPiece = chessBoard.getPiece(move.getStartPosition());
             ChessPiece endPositionPiece = chessBoard.getPiece(move.getEndPosition());
 
-            if (!doesMoveCauseCheck(move)) {
+            if (!doesMoveCauseCheck(move, pieceColor)) {
                 legalMoves.add(move);
             }
         }
 
         // Castling
-        // TODO: check that rook is also not in danger
-        if (piece.getPieceType() == ChessPiece.PieceType.KING && !isInCheck(piece.getTeamColor())) {
-            int row = (piece.getTeamColor() == TeamColor.WHITE) ? 1 : 8;
-            if (piece.getTeamColor() == TeamColor.WHITE && !whiteKingHasMoved) {
+        if (piece.getPieceType() == ChessPiece.PieceType.KING && !isInCheck(pieceColor)) {
+            int row = (pieceColor == TeamColor.WHITE) ? 1 : 8;
+            if (pieceColor == TeamColor.WHITE && !whiteKingHasMoved) {
                 if (!whiteLeftRookHasMoved) {
                     // Ensure path is clear
                     if (
@@ -94,7 +93,11 @@ public class ChessGame {
                             chessBoard.getPiece(new ChessPosition(row, 2)) == null
                     ) {
                         ChessMove move = new ChessMove(startPosition, new ChessPosition(row, 3), null);
-                        if (!doesMoveCauseCheck(move) ) {
+                        // Move cannot cause the King or Rook to be in danger
+                        if (
+                                !doesMoveCauseCheck(move, pieceColor) &&
+                                !doesMoveCausePositionDanger(move, new ChessPosition(row, 4), pieceColor)
+                        ) {
                             legalMoves.add(move);
                         }
                     }
@@ -106,13 +109,16 @@ public class ChessGame {
                             chessBoard.getPiece(new ChessPosition(row, 7)) == null
                     ) {
                         ChessMove move = new ChessMove(startPosition, new ChessPosition(row, 7), null);
-                        if (!doesMoveCauseCheck(move) ) {
+                        if (
+                                !doesMoveCauseCheck(move, pieceColor) &&
+                                !doesMoveCausePositionDanger(move, new ChessPosition(row, 6), pieceColor)
+                        ) {
                             legalMoves.add(move);
                         }
                     }
                 }
             }
-            else if (piece.getTeamColor() == TeamColor.BLACK && !blackKingHasMoved) {
+            else if (pieceColor == TeamColor.BLACK && !blackKingHasMoved) {
                 if (!blackLeftRookHasMoved) {
                     // Ensure path is clear
                     if (
@@ -121,7 +127,11 @@ public class ChessGame {
                             chessBoard.getPiece(new ChessPosition(row, 2)) == null
                     ) {
                         ChessMove move = new ChessMove(startPosition, new ChessPosition(row, 3), null);
-                        if (!doesMoveCauseCheck(move) ) {
+                        // Move cannot cause the King or Rook to be in danger
+                        if (
+                                !doesMoveCauseCheck(move, pieceColor) &&
+                                !doesMoveCausePositionDanger(move, new ChessPosition(row, 4), pieceColor)
+                        ) {
                             legalMoves.add(move);
                         }
                     }
@@ -133,7 +143,10 @@ public class ChessGame {
                             chessBoard.getPiece(new ChessPosition(row, 7)) == null
                     ) {
                         ChessMove move = new ChessMove(startPosition, new ChessPosition(row, 7), null);
-                        if (!doesMoveCauseCheck(move) ) {
+                        if (
+                                !doesMoveCauseCheck(move, pieceColor) &&
+                                !doesMoveCausePositionDanger(move, new ChessPosition(row, 6), pieceColor)
+                        ) {
                             legalMoves.add(move);
                         }
                     }
@@ -240,7 +253,7 @@ public class ChessGame {
                 ChessPosition position = new ChessPosition(row, col);
                 ChessPiece piece = chessBoard.getPiece(position);
                 if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
-                    return isInDanger(position);
+                    return isInDanger(position, teamColor);
                 }
             }
         }
@@ -337,12 +350,8 @@ public class ChessGame {
         return this.chessBoard;
     }
 
-    private boolean isInDanger(ChessPosition pos) {
+    private boolean isInDanger(ChessPosition pos, TeamColor teamColor) {
         ChessPiece target = chessBoard.getPiece(pos);
-        if (target == null) {
-            return false; // i guess
-        }
-        TeamColor teamColor = target.getTeamColor();
 
         for (int row = 1; row <= 8; ++row) {
             for (int col = 1; col <= 8; ++col) {
@@ -365,18 +374,35 @@ public class ChessGame {
         return false;
     }
 
-    private boolean doesMoveCauseCheck(ChessMove move) {
+    private boolean doesMoveCauseCheck(ChessMove move, TeamColor teamColor) {
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
 
         ChessPiece startPositionPiece = chessBoard.getPiece(startPosition);
-        TeamColor teamColor = startPositionPiece.getTeamColor();
         ChessPiece endPositionPiece = chessBoard.getPiece(endPosition);
 
         // Make the move but don't promote
         chessBoard.movePiece(move);
 
         boolean res = isInCheck(teamColor);
+
+        // Revert the move
+        chessBoard.addPiece(startPosition, startPositionPiece);
+        chessBoard.addPiece(endPosition, endPositionPiece);
+
+        return res;
+    }
+
+    private boolean doesMoveCausePositionDanger(ChessMove move, ChessPosition piecePosition, TeamColor teamColor) {
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPosition endPosition = move.getEndPosition();
+
+        ChessPiece startPositionPiece = chessBoard.getPiece(startPosition);
+        ChessPiece endPositionPiece = chessBoard.getPiece(endPosition);
+
+        chessBoard.movePiece(move);
+
+        boolean res = isInDanger(piecePosition, teamColor);
 
         // Revert the move
         chessBoard.addPiece(startPosition, startPositionPiece);
