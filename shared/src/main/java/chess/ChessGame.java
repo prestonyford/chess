@@ -168,7 +168,8 @@ public class ChessGame {
         ChessPiece piece = chessBoard.getPiece(startPosition);
         Collection<ChessMove> moves = validMoves(startPosition);
         if (
-                moves != null && moves.contains(move) &&
+                moves != null &&
+                moves.contains(move) &&
                 piece.getTeamColor() == teamTurn
         ) {
             chessBoard.movePiece(move);
@@ -187,24 +188,24 @@ public class ChessGame {
                     if (piece.getTeamColor() == TeamColor.WHITE) {
                         whiteRightRookHasMoved = true;
                         ChessPosition rookPos = new ChessPosition(1, 8);
-                        chessBoard.movePiece(new ChessMove(rookPos, new ChessPosition(8, 6), null));
+                        chessBoard.movePiece(new ChessMove(rookPos, new ChessPosition(1, 6), null));
                     }
                     else if (piece.getTeamColor() == TeamColor.BLACK) {
                         blackRightRookHasMoved = true;
                         ChessPosition rookPos = new ChessPosition(8, 8);
-                        chessBoard.movePiece(new ChessMove(rookPos, new ChessPosition(1, 6), null));
+                        chessBoard.movePiece(new ChessMove(rookPos, new ChessPosition(8, 6), null));
                     }
                 }
                 else if (endPosition.getColumn() - startPosition.getColumn() == -2) {
                     if (piece.getTeamColor() == TeamColor.WHITE) {
                         whiteLeftRookHasMoved = true;
                         ChessPosition rookPos = new ChessPosition(1, 1);
-                        chessBoard.movePiece(new ChessMove(rookPos, new ChessPosition(1, 3), null));
+                        chessBoard.movePiece(new ChessMove(rookPos, new ChessPosition(1, 4), null));
                     }
                     else if (piece.getTeamColor() == TeamColor.BLACK) {
                         blackLeftRookHasMoved = true;
                         ChessPosition rookPos = new ChessPosition(8, 1);
-                        chessBoard.movePiece(new ChessMove(rookPos, new ChessPosition(8, 3), null));
+                        chessBoard.movePiece(new ChessMove(rookPos, new ChessPosition(8, 4), null));
                     }
                 }
             }
@@ -236,7 +237,7 @@ public class ChessGame {
             }
         }
         else {
-            // System.out.println("invalid move made!");
+            System.out.println(moves.contains(move)? "Contained move: " + move.toString() : "Did not contain move "  + move.toString());
             throw new InvalidMoveException();
         }
     }
@@ -339,6 +340,12 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.chessBoard = board;
+        whiteKingHasMoved = false;
+        whiteLeftRookHasMoved = false;
+        whiteRightRookHasMoved = false;
+        blackKingHasMoved = false;
+        blackLeftRookHasMoved = false;
+        blackRightRookHasMoved = false;
     }
 
     /**
