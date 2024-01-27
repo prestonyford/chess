@@ -77,9 +77,6 @@ public class ChessGame {
         TeamColor pieceColor = piece.getTeamColor();
 
         for (ChessMove move: moves) {
-            ChessPiece startPositionPiece = chessBoard.getPiece(move.getStartPosition());
-            ChessPiece endPositionPiece = chessBoard.getPiece(move.getEndPosition());
-
             if (!doesMoveCauseCheck(move, pieceColor)) {
                 legalMoves.add(move);
             }
@@ -392,8 +389,8 @@ public class ChessGame {
                 if (piece == null || piece.getTeamColor() != teamColor) {
                     continue;
                 }
-                Collection<ChessMove> pieceMoves = validMoves(position);
-                if (pieceMoves != null && !pieceMoves.isEmpty()) {
+                Collection<ChessMove> moves = validMoves(position);
+                if (moves != null && !moves.isEmpty()) {
                     return false;
                 }
             }
@@ -409,12 +406,38 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.chessBoard = board;
-        whiteKingHasMoved = false;
-        whiteLeftRookHasMoved = false;
-        whiteRightRookHasMoved = false;
-        blackKingHasMoved = false;
-        blackLeftRookHasMoved = false;
-        blackRightRookHasMoved = false;
+
+        ChessPosition whiteKingPos = new ChessPosition(1, 5);
+        ChessPosition whiteLeftRookPos = new ChessPosition(1, 1);
+        ChessPosition whiteRightRookPos = new ChessPosition(1, 8);
+        ChessPosition blackKingPos = new ChessPosition(8, 5);
+        ChessPosition blackLeftRookPos = new ChessPosition(8, 1);
+        ChessPosition blackRightRookPos = new ChessPosition(8, 8);
+
+        whiteKingHasMoved = board.getPiece(whiteKingPos) == null ||
+                board.getPiece(whiteKingPos).getPieceType() != ChessPiece.PieceType.KING ||
+                board.getPiece(whiteKingPos).getTeamColor() != TeamColor.WHITE;
+
+        whiteLeftRookHasMoved = board.getPiece(whiteLeftRookPos) == null ||
+                board.getPiece(whiteLeftRookPos).getPieceType() != ChessPiece.PieceType.ROOK ||
+                board.getPiece(whiteRightRookPos).getTeamColor() != TeamColor.WHITE;
+
+        whiteRightRookHasMoved = board.getPiece(whiteRightRookPos) == null ||
+                board.getPiece(whiteRightRookPos).getPieceType() != ChessPiece.PieceType.ROOK ||
+                board.getPiece(whiteRightRookPos).getTeamColor() != TeamColor.WHITE;
+
+
+        blackKingHasMoved = board.getPiece(blackKingPos) == null ||
+                board.getPiece(blackKingPos).getPieceType() != ChessPiece.PieceType.KING ||
+                board.getPiece(blackKingPos).getTeamColor() != TeamColor.BLACK;
+
+        blackLeftRookHasMoved = board.getPiece(blackLeftRookPos) == null ||
+                board.getPiece(blackLeftRookPos).getPieceType() != ChessPiece.PieceType.ROOK ||
+                board.getPiece(blackLeftRookPos).getTeamColor() != TeamColor.BLACK;
+
+        blackRightRookHasMoved = board.getPiece(blackRightRookPos) == null ||
+                board.getPiece(blackRightRookPos).getPieceType() != ChessPiece.PieceType.ROOK ||
+                board.getPiece(blackRightRookPos).getTeamColor() != TeamColor.BLACK;
     }
 
     /**
@@ -427,8 +450,6 @@ public class ChessGame {
     }
 
     private boolean isInDanger(ChessPosition pos, TeamColor teamColor) {
-        ChessPiece target = chessBoard.getPiece(pos);
-
         for (int row = 1; row <= 8; ++row) {
             for (int col = 1; col <= 8; ++col) {
                 ChessPosition startPosition = new ChessPosition(row, col);
