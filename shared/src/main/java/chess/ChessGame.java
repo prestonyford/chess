@@ -420,7 +420,7 @@ public class ChessGame {
 
         whiteLeftRookHasMoved = board.getPiece(whiteLeftRookPos) == null ||
                 board.getPiece(whiteLeftRookPos).getPieceType() != ChessPiece.PieceType.ROOK ||
-                board.getPiece(whiteRightRookPos).getTeamColor() != TeamColor.WHITE;
+                board.getPiece(whiteLeftRookPos).getTeamColor() != TeamColor.WHITE;
 
         whiteRightRookHasMoved = board.getPiece(whiteRightRookPos) == null ||
                 board.getPiece(whiteRightRookPos).getPieceType() != ChessPiece.PieceType.ROOK ||
