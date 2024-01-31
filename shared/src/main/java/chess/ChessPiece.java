@@ -41,7 +41,6 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        // throw new RuntimeException("Not implemented");
         return this.pieceColor;
     }
 
@@ -49,7 +48,6 @@ public class ChessPiece {
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        // throw new RuntimeException("Not implemented");
         return this.type;
     }
 
@@ -61,8 +59,6 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        HashSet<ChessMove> moves = new HashSet<ChessMove>();
-
         return switch (this.type) {
             case KING -> new KingMoves(board, myPosition, pieceColor).getMoves();
             case QUEEN -> new QueenMoves(board, myPosition, pieceColor).getMoves();
@@ -71,27 +67,6 @@ public class ChessPiece {
             case ROOK -> new RookMoves(board, myPosition, pieceColor).getMoves();
             case PAWN -> new PawnMoves(board, myPosition, pieceColor).getMoves();
         };
-    }
-
-    private HashSet<ChessMove> findMovesInDirection(ChessBoard board, ChessPosition myPosition, int[] direction) {
-        int row = myPosition.getRow() + direction[0];
-        int col = myPosition.getColumn() + direction[1];
-        HashSet<ChessMove> moves = new HashSet<ChessMove>();
-        while (ChessBoard.validTile(new ChessPosition(row, col))) {
-            ChessPosition endPosition = new ChessPosition(row, col);
-            // If spot taken by ally, do not add and stop adding that direction to moves
-            if (board.getPiece(endPosition) != null && board.getPiece(endPosition).getTeamColor() == this.pieceColor) {
-                break;
-            }
-            moves.add(new ChessMove(myPosition, endPosition, null));
-            // If spot is an enemy, capture and stop adding that direction to moves
-            if (board.getPiece(endPosition) != null) {
-                break;
-            }
-            row += direction[0];
-            col += direction[1];
-        }
-        return moves;
     }
 
     @Override
