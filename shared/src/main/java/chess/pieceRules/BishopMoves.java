@@ -1,4 +1,4 @@
-package chess.PieceRules;
+package chess.pieceRules;
 
 import chess.ChessBoard;
 import chess.ChessGame;
@@ -8,8 +8,8 @@ import chess.ChessPosition;
 import java.util.Collection;
 import java.util.HashSet;
 
-public class QueenMoves extends PieceMoves {
-    public QueenMoves(ChessBoard board, ChessPosition pos, ChessGame.TeamColor color) {
+public class BishopMoves extends PieceMoves {
+    public BishopMoves(ChessBoard board, ChessPosition pos, ChessGame.TeamColor color) {
         super(board, pos, color);
     }
 
@@ -18,12 +18,8 @@ public class QueenMoves extends PieceMoves {
         HashSet<ChessMove> moves = new HashSet<>();
         for (var direction: new int[][]{
                 {1, -1},
-                {1, 0},
                 {1, 1},
-                {0, -1},
-                {0, 1},
                 {-1, -1},
-                {-1, 0},
                 {-1, 1}
         }) {
             moves.addAll(findMovesInDirection(direction));

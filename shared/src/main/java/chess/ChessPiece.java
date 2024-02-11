@@ -1,9 +1,8 @@
 package chess;
 
-import chess.PieceRules.*;
+import chess.pieceRules.*;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Objects;
 
 /**

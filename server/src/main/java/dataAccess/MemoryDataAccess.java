@@ -1,8 +1,8 @@
 package dataAccess;
 
-import chess.AuthData;
-import chess.GameData;
-import chess.UserData;
+import chess.dataModel.AuthData;
+import chess.dataModel.GameData;
+import chess.dataModel.UserData;
 
 import java.util.Collection;
 import java.util.HashSet;

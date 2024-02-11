@@ -1,4 +1,4 @@
-package chess;
+package chess.dataModel;
 
 public record AuthData(
         String authToken,

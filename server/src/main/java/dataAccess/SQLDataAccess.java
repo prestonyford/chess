@@ -1,9 +1,8 @@
 package dataAccess;
 
-import chess.AuthData;
-import chess.GameData;
-import chess.UserData;
-import jdk.jshell.spi.ExecutionControl.NotImplementedException;
+import chess.dataModel.AuthData;
+import chess.dataModel.GameData;
+import chess.dataModel.UserData;
 
 import java.util.Collection;
 

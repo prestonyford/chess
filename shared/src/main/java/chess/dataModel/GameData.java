@@ -1,4 +1,6 @@
-package chess;
+package chess.dataModel;
+
+import chess.ChessGame;
 
 public record GameData(
         int gameID,
