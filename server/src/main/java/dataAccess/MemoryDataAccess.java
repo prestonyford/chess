@@ -6,6 +6,7 @@ import chess.dataModel.UserData;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 
 public class MemoryDataAccess extends DataAccess {
     private HashSet<UserData> users = new HashSet<>();
@@ -14,17 +15,22 @@ public class MemoryDataAccess extends DataAccess {
 
     @Override
     public UserData getUser(String username) {
-        throw new RuntimeException("Not implemented");
+        for (var user: users) {
+            if (Objects.equals(user.username(), username)) {
+                return user;
+            }
+        }
+        return null;
     }
 
     @Override
     public void createUser(UserData userData) {
-        throw new RuntimeException("Not implemented");
+        users.add(userData);
     }
 
     @Override
-    public AuthData createAuth(String username) {
-        throw new RuntimeException("Not implemented");
+    public void createAuth(AuthData authData) {
+        auths.add(authData);
     }
 
     @Override

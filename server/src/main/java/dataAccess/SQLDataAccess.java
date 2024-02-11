@@ -18,7 +18,7 @@ public class SQLDataAccess extends DataAccess {
     }
 
     @Override
-    public AuthData createAuth(String username) {
+    public void createAuth(AuthData authData) {
         throw new RuntimeException("Not implemented");
     }
 
