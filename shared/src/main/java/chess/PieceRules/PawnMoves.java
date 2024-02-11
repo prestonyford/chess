@@ -57,7 +57,6 @@ public class PawnMoves extends PieceMoves {
 
         // If first move, Pawn can optionally move two squares
         ChessPosition forwardTwoPosition = new ChessPosition(pos.getRow() + (2 * direction), pos.getColumn());
-        System.out.println(forwardTwoPosition);
         if (
                 (color == ChessGame.TeamColor.WHITE && pos.getRow() == 2) ||
                 (color == ChessGame.TeamColor.BLACK && pos.getRow() == 7)

@@ -300,12 +300,7 @@ public class ChessGame {
         chessBoard.movePiece(move);
 
         // Swap team color
-        if (this.teamTurn == TeamColor.WHITE) {
-            this.teamTurn = TeamColor.BLACK;
-        }
-        else {
-            this.teamTurn = TeamColor.WHITE;
-        }
+        this.teamTurn = this.teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
     /**
@@ -324,7 +319,7 @@ public class ChessGame {
                 }
             }
         }
-        System.out.println("Could not find king to determine if in check");
+        // System.out.println("Could not find king to determine if in check");
         return false;
     }
 
