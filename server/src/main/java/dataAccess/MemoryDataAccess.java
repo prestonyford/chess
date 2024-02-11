@@ -5,8 +5,13 @@ import chess.GameData;
 import chess.UserData;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 public class MemoryDataAccess extends DataAccess {
+    private HashSet<UserData> users = new HashSet<>();
+    private HashSet<AuthData> auths = new HashSet<>();
+    private HashSet<GameData> games = new HashSet<>();
+
     @Override
     public UserData getUser(String username) {
         throw new RuntimeException("Not implemented");
@@ -44,6 +49,8 @@ public class MemoryDataAccess extends DataAccess {
 
     @Override
     public void clear() {
-        throw new RuntimeException("Not implemented");
+        users.clear();
+        auths.clear();
+        games.clear();
     }
 }
