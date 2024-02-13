@@ -5,12 +5,8 @@ import chess.dataModel.UserData;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.RegisterResponse;
 import dataAccess.DataAccessException;
-import service.exceptions.BadRequestException;
-import service.exceptions.InternalServerErrorException;
 import service.exceptions.ServiceException;
-import service.exceptions.UserAlreadyTakenException;
 
-import javax.xml.crypto.Data;
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -27,13 +23,13 @@ public class UserService extends Service {
                 {registerRequest.username(), registerRequest.password(), registerRequest.email()}
         ) {
             if (field == null) {
-                throw new BadRequestException("Error: bad request");
+                throw new ServiceException(400, "Error: bad request");
             }
         }
-
         if (db.getUser(registerRequest.username()) != null) {
-            throw new UserAlreadyTakenException("Error: already taken");
+            throw new ServiceException(403, "Error: already taken");
         }
+
         try {
             db.createUser(new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email()));
             var authData = new AuthData(createAuthToken(), registerRequest.username());
@@ -41,7 +37,7 @@ public class UserService extends Service {
             return new RegisterResponse(authData.username(), authData.authToken());
         }
         catch (DataAccessException ex) {
-            throw new InternalServerErrorException("idk man");
+            throw new ServiceException(500, "idk man");
         }
     }
 }

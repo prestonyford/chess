@@ -3,12 +3,10 @@ package server;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.RegisterResponse;
 import com.google.gson.Gson;
-import dataAccess.DataAccessException;
 import service.ApplicationService;
 import service.GameService;
 import service.UserService;
 import service.exceptions.ServiceException;
-import service.exceptions.UserAlreadyTakenException;
 import spark.*;
 
 import java.util.Map;
