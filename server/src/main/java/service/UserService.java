@@ -5,7 +5,11 @@ import chess.dataModel.UserData;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.RegisterResponse;
 import dataAccess.DataAccessException;
+import service.exceptions.BadRequestException;
+import service.exceptions.ServiceException;
+import service.exceptions.UserAlreadyTakenException;
 
+import javax.xml.crypto.Data;
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -17,13 +21,18 @@ public class UserService extends Service {
         secureRandom.nextBytes(randomBytes);
         return base64Encoder.encodeToString(randomBytes);
     }
-    public RegisterResponse register(RegisterRequest registerRequest) throws DataAccessException {
+    public RegisterResponse register(RegisterRequest registerRequest) throws ServiceException {
         if (db.getUser(registerRequest.username()) != null) {
-            throw new DataAccessException("Error: already taken");
+            throw new UserAlreadyTakenException("Error: already taken");
         }
-        db.createUser(new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email()));
-        var authData = new AuthData(createAuthToken(), registerRequest.username());
-        db.createAuth(authData);
-        return new RegisterResponse(authData.username(), authData.authToken());
+        try {
+            db.createUser(new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email()));
+            var authData = new AuthData(createAuthToken(), registerRequest.username());
+            db.createAuth(authData);
+            return new RegisterResponse(authData.username(), authData.authToken());
+        }
+        catch (DataAccessException ex) {
+            throw new ServiceException("placeholder for 500");
+        }
     }
 }

@@ -7,6 +7,8 @@ import dataAccess.DataAccessException;
 import service.ApplicationService;
 import service.GameService;
 import service.UserService;
+import service.exceptions.ServiceException;
+import service.exceptions.UserAlreadyTakenException;
 import spark.*;
 
 public class Server {
@@ -35,9 +37,9 @@ public class Server {
                 body = new Gson().toJson(registerResponse);
                 res.status(200);
             }
-            catch (DataAccessException ex) {
+            catch (ServiceException ex) {
                 body = ex.getMessage();
-                res.status(400);
+                res.status(ex.getCode());
             }
             res.body(body);
             return body;
