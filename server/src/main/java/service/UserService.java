@@ -6,6 +6,7 @@ import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.RegisterResponse;
 import dataAccess.DataAccessException;
 import service.exceptions.BadRequestException;
+import service.exceptions.InternalServerErrorException;
 import service.exceptions.ServiceException;
 import service.exceptions.UserAlreadyTakenException;
 
@@ -32,7 +33,7 @@ public class UserService extends Service {
             return new RegisterResponse(authData.username(), authData.authToken());
         }
         catch (DataAccessException ex) {
-            throw new ServiceException("placeholder for 500");
+            throw new InternalServerErrorException("idk man");
         }
     }
 }
