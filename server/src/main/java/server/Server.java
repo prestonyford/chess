@@ -11,6 +11,8 @@ import service.exceptions.ServiceException;
 import service.exceptions.UserAlreadyTakenException;
 import spark.*;
 
+import java.util.Map;
+
 public class Server {
 
     public int run(int desiredPort) {
@@ -38,7 +40,7 @@ public class Server {
                 res.status(200);
             }
             catch (ServiceException ex) {
-                body = ex.getMessage();
+                body = new Gson().toJson(Map.of("message", ex.getMessage()));
                 res.status(ex.getCode());
             }
             res.body(body);
