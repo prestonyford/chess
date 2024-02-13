@@ -23,6 +23,14 @@ public class UserService extends Service {
         return base64Encoder.encodeToString(randomBytes);
     }
     public RegisterResponse register(RegisterRequest registerRequest) throws ServiceException {
+        for (var field: new String[]
+                {registerRequest.username(), registerRequest.password(), registerRequest.email()}
+        ) {
+            if (field == null) {
+                throw new BadRequestException("Error: bad request");
+            }
+        }
+
         if (db.getUser(registerRequest.username()) != null) {
             throw new UserAlreadyTakenException("Error: already taken");
         }
