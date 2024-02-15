@@ -2,7 +2,6 @@ package server;
 
 import chess.dataModel.request.CreateGameRequest;
 import chess.dataModel.request.LoginRequest;
-import chess.dataModel.request.LogoutRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.CreateGameResponse;
 import chess.dataModel.response.LoginResponse;
@@ -16,7 +15,6 @@ import service.exceptions.ServiceException;
 import spark.*;
 
 import java.util.Map;
-import java.util.Objects;
 
 public class Server {
 
@@ -69,8 +67,7 @@ public class Server {
         });
 
         Spark.delete("/session", (req, res) -> {
-            LogoutRequest logoutRequest = new LogoutRequest(req.headers("Authorization"));
-            userService.logout(logoutRequest);
+            userService.logout(req.headers("Authorization"));
             res.status(200);
             res.body("");
             return "";
@@ -78,8 +75,7 @@ public class Server {
 
         Spark.post("/game", (req, res) -> {
             CreateGameRequest createGameRequest = new Gson().fromJson(req.body(), CreateGameRequest.class);
-            createGameRequest.setAuthToken(req.headers("Authorization"));
-            CreateGameResponse createGameResponse = gameService.createGame(createGameRequest);
+            CreateGameResponse createGameResponse = gameService.createGame(req.headers("Authorization"), createGameRequest);
             res.status(200);
             res.type("application/json");
             String body = new Gson().toJson(createGameResponse);

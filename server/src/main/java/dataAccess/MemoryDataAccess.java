@@ -31,13 +31,13 @@ public class MemoryDataAccess extends DataAccess {
     @Override
     public void insertAuth(AuthData authData) {
         // Remove old auth
-        for (var auth: auths) {
+        /*for (var auth: auths) {
             if (Objects.equals(auth.username(), authData.username())){
                 deleteAuth(auth);
                 System.out.println("deleted old auth");
                 break;
             }
-        }
+        }*/
         // Add new auth
         auths.add(authData);
     }

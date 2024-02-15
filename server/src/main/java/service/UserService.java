@@ -3,7 +3,6 @@ package service;
 import chess.dataModel.AuthData;
 import chess.dataModel.UserData;
 import chess.dataModel.request.LoginRequest;
-import chess.dataModel.request.LogoutRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
@@ -57,8 +56,8 @@ public class UserService extends Service {
         db.insertAuth(authData);
         return new LoginResponse(authData.username(), authData.authToken());
     }
-    public void logout(LogoutRequest logoutRequest) throws ServiceException, DataAccessException {
-        AuthData authData = db.getAuth(logoutRequest.getAuthToken());
+    public void logout(String authToken) throws ServiceException, DataAccessException {
+        AuthData authData = db.getAuth(authToken);
         if (authData == null) {
             throw new ServiceException(401, "Error: unauthorized");
         }
