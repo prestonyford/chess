@@ -36,7 +36,7 @@ public class UserService extends Service {
 
         db.createUser(new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email()));
         var authData = new AuthData(createAuthToken(), registerRequest.username());
-        db.createAuth(authData);
+        db.insertAuth(authData);
         return new RegisterResponse(authData.username(), authData.authToken());
     }
     public LoginResponse login(LoginRequest loginRequest) throws ServiceException, DataAccessException {
@@ -44,11 +44,16 @@ public class UserService extends Service {
         if (user == null || !Objects.equals(user.password(), loginRequest.password())) {
             throw new ServiceException(401, "Error: unauthorized");
         }
+        // Create new auth
         var authData = new AuthData(createAuthToken(), loginRequest.username());
-        db.createAuth(authData);
+        db.insertAuth(authData);
         return new LoginResponse(authData.username(), authData.authToken());
     }
     public void logout(LogoutRequest logoutRequest) throws ServiceException, DataAccessException {
-        logoutRequest.getAuthToken();
+        AuthData authData = db.getAuth(logoutRequest.getAuthToken());
+        if (authData == null) {
+            throw new ServiceException(401, "Error: unauthorized");
+        }
+        db.deleteAuth(authData);
     }
 }

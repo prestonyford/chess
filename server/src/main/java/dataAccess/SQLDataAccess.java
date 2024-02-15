@@ -18,7 +18,7 @@ public class SQLDataAccess extends DataAccess {
     }
 
     @Override
-    public void createAuth(AuthData authData) {
+    public void insertAuth(AuthData authData) {
         throw new RuntimeException("Not implemented");
     }
 
@@ -36,12 +36,17 @@ public class SQLDataAccess extends DataAccess {
     }
 
     @Override
-    public GameData createGame(String gameName) {
+    public GameData insertGame(GameData gameData) {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public GameData updateGame(GameData gameData) {
+    public GameData getGame(int gameID) throws DataAccessException {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public GameData updateGame(int gameID, GameData gameData) {
         throw new RuntimeException("Not implemented");
     }
 

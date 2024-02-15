@@ -29,7 +29,16 @@ public class MemoryDataAccess extends DataAccess {
     }
 
     @Override
-    public void createAuth(AuthData authData) {
+    public void insertAuth(AuthData authData) {
+        // Remove old auth
+        for (var auth: auths) {
+            if (Objects.equals(auth.username(), authData.username())){
+                deleteAuth(auth);
+                System.out.println("deleted old auth");
+                break;
+            }
+        }
+        // Add new auth
         auths.add(authData);
     }
 
@@ -54,12 +63,25 @@ public class MemoryDataAccess extends DataAccess {
     }
 
     @Override
-    public GameData createGame(String gameName) {
-        throw new RuntimeException("Not implemented");
+    public GameData insertGame(GameData gameData) {
+        /*GameData newGame = new GameData(
+
+        )*/
+        return null;
     }
 
     @Override
-    public GameData updateGame(GameData gameData) {
+    public GameData getGame(int gameID) throws DataAccessException {
+        for (var game: games) {
+            if (game.gameID() == gameID) {
+                return game;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public GameData updateGame(int gameID, GameData gameData) {
         throw new RuntimeException("Not implemented");
     }
 
