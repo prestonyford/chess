@@ -1,6 +1,7 @@
 package server;
 
 import chess.dataModel.request.LoginRequest;
+import chess.dataModel.request.LogoutRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
@@ -63,7 +64,11 @@ public class Server {
         });
 
         Spark.delete("/session", (req, res) -> {
-
+            LogoutRequest logoutRequest = new LogoutRequest(req.headers("authorization"));
+            userService.
+            res.status(200);
+            res.body("");
+            return "";
         });
 
         Spark.awaitInitialization();

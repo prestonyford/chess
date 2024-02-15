@@ -34,8 +34,18 @@ public class MemoryDataAccess extends DataAccess {
     }
 
     @Override
-    public void deleteAuth(String authToken) {
-        throw new RuntimeException("Not implemented");
+    public AuthData getAuth(String authToken) {
+        for (var auth: auths) {
+            if (Objects.equals(auth.authToken(), authToken)) {
+                return auth;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void deleteAuth(AuthData authData) {
+        auths.remove(authData);
     }
 
     @Override

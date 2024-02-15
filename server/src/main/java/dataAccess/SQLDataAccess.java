@@ -23,7 +23,10 @@ public class SQLDataAccess extends DataAccess {
     }
 
     @Override
-    public void deleteAuth(String authToken) {
+    public AuthData getAuth(String authToken) { throw new RuntimeException("Not implemented"); }
+
+    @Override
+    public void deleteAuth(AuthData authData) {
         throw new RuntimeException("Not implemented");
     }
 

@@ -3,6 +3,7 @@ package service;
 import chess.dataModel.AuthData;
 import chess.dataModel.UserData;
 import chess.dataModel.request.LoginRequest;
+import chess.dataModel.request.LogoutRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
@@ -46,5 +47,8 @@ public class UserService extends Service {
         var authData = new AuthData(createAuthToken(), loginRequest.username());
         db.createAuth(authData);
         return new LoginResponse(authData.username(), authData.authToken());
+    }
+    public void logout(LogoutRequest logoutRequest) throws ServiceException, DataAccessException {
+        logoutRequest.getAuthToken();
     }
 }
