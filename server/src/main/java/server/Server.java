@@ -28,24 +28,19 @@ public class Server {
         GameService gameService = GameService.getInstance();
         ApplicationService applicationService = ApplicationService.getInstance();
 
-        // Register your endpoints and handle exceptions here.
-
         // Handle all endpoint ServiceExceptions
         Spark.exception(ServiceException.class, (ex, req, res) -> {
-            if (Objects.equals(req.pathInfo(), "/session") && req.requestMethod().equals("DELETE")) {
-                System.out.println(req.pathInfo());
-            }
-
             String body = new Gson().toJson(Map.of("message", ex.getMessage()));
             res.type("application/json");
             res.body(body);
             res.status(ex.getCode());
         });
-        // Handle DataAccess exceptions
+        // Handle all endpoint DataAccess exceptions
         Spark.exception(DataAccessException.class, (ex, req, res) -> {
             res.status(500);
         });
 
+        // Handle endpoints
         Spark.delete("/db", (req, res) -> {
             applicationService.bigRedButton();
             res.status(200);
@@ -56,9 +51,9 @@ public class Server {
         Spark.post("/user", (req, res) -> {
             RegisterRequest registerRequest = new Gson().fromJson(req.body(), RegisterRequest.class);
             RegisterResponse registerResponse = userService.register(registerRequest);
-            String body = new Gson().toJson(registerResponse);
             res.status(200);
             res.type("application/json");
+            String body = new Gson().toJson(registerResponse);
             res.body(body);
             return body;
         });
@@ -74,7 +69,6 @@ public class Server {
         });
 
         Spark.delete("/session", (req, res) -> {
-            System.out.println(req.headers());
             LogoutRequest logoutRequest = new LogoutRequest(req.headers("Authorization"));
             userService.logout(logoutRequest);
             res.status(200);
@@ -86,6 +80,8 @@ public class Server {
             CreateGameRequest createGameRequest = new Gson().fromJson(req.body(), CreateGameRequest.class);
             createGameRequest.setAuthToken(req.headers("Authorization"));
             CreateGameResponse createGameResponse = gameService.createGame(createGameRequest);
+            res.status(200);
+            res.type("application/json");
             String body = new Gson().toJson(createGameResponse);
             res.body(body);
             return body;

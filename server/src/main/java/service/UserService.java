@@ -20,13 +20,16 @@ public class UserService extends Service {
     public static UserService getInstance() {
         return INSTANCE;
     }
-    private final SecureRandom secureRandom = new SecureRandom();
-    private final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
-    private String createAuthToken() {
-        byte[] randomBytes = new byte[24];
-        secureRandom.nextBytes(randomBytes);
-        return base64Encoder.encodeToString(randomBytes);
+    private static class AuthTokenGen {
+        private static final SecureRandom secureRandom = new SecureRandom();
+        private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
+        public static String createAuthToken() {
+            byte[] randomBytes = new byte[24];
+            secureRandom.nextBytes(randomBytes);
+            return base64Encoder.encodeToString(randomBytes);
+        }
     }
+
     public RegisterResponse register(RegisterRequest registerRequest) throws ServiceException, DataAccessException {
         for (var field: new String[]
                 {registerRequest.username(), registerRequest.password(), registerRequest.email()}
@@ -40,7 +43,7 @@ public class UserService extends Service {
         }
 
         db.createUser(new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email()));
-        var authData = new AuthData(createAuthToken(), registerRequest.username());
+        var authData = new AuthData(AuthTokenGen.createAuthToken(), registerRequest.username());
         db.insertAuth(authData);
         return new RegisterResponse(authData.username(), authData.authToken());
     }
@@ -50,7 +53,7 @@ public class UserService extends Service {
             throw new ServiceException(401, "Error: unauthorized");
         }
         // Create new auth
-        var authData = new AuthData(createAuthToken(), loginRequest.username());
+        var authData = new AuthData(AuthTokenGen.createAuthToken(), loginRequest.username());
         db.insertAuth(authData);
         return new LoginResponse(authData.username(), authData.authToken());
     }
