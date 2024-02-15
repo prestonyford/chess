@@ -2,13 +2,16 @@ package service;
 
 import chess.dataModel.AuthData;
 import chess.dataModel.UserData;
+import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
+import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import dataAccess.DataAccessException;
 import service.exceptions.ServiceException;
 
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Objects;
 
 public class UserService extends Service {
     private final SecureRandom secureRandom = new SecureRandom();
@@ -18,11 +21,11 @@ public class UserService extends Service {
         secureRandom.nextBytes(randomBytes);
         return base64Encoder.encodeToString(randomBytes);
     }
-    public RegisterResponse register(RegisterRequest registerRequest) throws ServiceException {
+    public RegisterResponse register(RegisterRequest registerRequest) throws ServiceException, DataAccessException {
         for (var field: new String[]
                 {registerRequest.username(), registerRequest.password(), registerRequest.email()}
         ) {
-            if (field == null) {
+            if (field == null || field.isEmpty()) {
                 throw new ServiceException(400, "Error: bad request");
             }
         }
@@ -30,14 +33,18 @@ public class UserService extends Service {
             throw new ServiceException(403, "Error: already taken");
         }
 
-        try {
-            db.createUser(new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email()));
-            var authData = new AuthData(createAuthToken(), registerRequest.username());
-            db.createAuth(authData);
-            return new RegisterResponse(authData.username(), authData.authToken());
+        db.createUser(new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email()));
+        var authData = new AuthData(createAuthToken(), registerRequest.username());
+        db.createAuth(authData);
+        return new RegisterResponse(authData.username(), authData.authToken());
+    }
+    public LoginResponse login(LoginRequest loginRequest) throws ServiceException, DataAccessException {
+        UserData user = db.getUser(loginRequest.username());
+        if (user == null || !Objects.equals(user.password(), loginRequest.password())) {
+            throw new ServiceException(401, "Error: unauthorized");
         }
-        catch (DataAccessException ex) {
-            throw new ServiceException(500, "idk man");
-        }
+        var authData = new AuthData(createAuthToken(), loginRequest.username());
+        db.createAuth(authData);
+        return new LoginResponse(authData.username(), authData.authToken());
     }
 }
