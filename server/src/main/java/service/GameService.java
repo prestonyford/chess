@@ -57,6 +57,9 @@ public class GameService extends Service {
         GameData gameData = db.getGame(joinGameRequest.gameID());
         GameData updatedGame;
         if (Objects.equals(joinGameRequest.playerColor(), "WHITE")) {
+            if (gameData.whiteUsername() != null) {
+                throw new ServiceException(403, "Error: already taken");
+            }
             updatedGame = new GameData(
                     gameData.gameID(),
                     auth.username(),
@@ -66,6 +69,9 @@ public class GameService extends Service {
             );
         }
         else if (Objects.equals(joinGameRequest.playerColor(), "BLACK")) {
+            if (gameData.blackUsername() != null) {
+                throw new ServiceException(403, "Error: already taken");
+            }
             updatedGame = new GameData(
                     gameData.gameID(),
                     gameData.whiteUsername(),
