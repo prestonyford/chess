@@ -1,6 +1,7 @@
 package server;
 
 import chess.dataModel.request.CreateGameRequest;
+import chess.dataModel.request.JoinGameRequest;
 import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.CreateGameResponse;
@@ -81,6 +82,14 @@ public class Server {
             String body = new Gson().toJson(createGameResponse);
             res.body(body);
             return body;
+        });
+
+        Spark.put("/game", (req, res) -> {
+            JoinGameRequest joinGameRequest = new Gson().fromJson(req.body(), JoinGameRequest.class);
+            gameService.joinGame(req.headers("Authorization"), joinGameRequest);
+            res.status(200);
+            res.body("");
+            return "";
         });
 
         Spark.awaitInitialization();

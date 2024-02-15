@@ -36,7 +36,7 @@ public class SQLDataAccess extends DataAccess {
     }
 
     @Override
-    public GameData insertGame(GameData gameData) {
+    public void insertGame(GameData gameData) {
         throw new RuntimeException("Not implemented");
     }
 
@@ -46,7 +46,7 @@ public class SQLDataAccess extends DataAccess {
     }
 
     @Override
-    public GameData updateGame(int gameID, GameData gameData) {
+    public void updateGame(int gameID, GameData gameData) {
         throw new RuntimeException("Not implemented");
     }
 

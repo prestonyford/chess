@@ -26,14 +26,22 @@ public class ChessGame {
     private ChessPosition lastBlackPawnToDoubleMove = null;
 
     public ChessGame() {
-//        chessBoard = new ChessBoard();
-//        chessBoard.resetBoard();
-//        teamTurn = TeamColor.WHITE;
+        chessBoard = new ChessBoard();
+        chessBoard.resetBoard();
+        teamTurn = TeamColor.WHITE;
     }
 
     public ChessGame(ChessGame other) {
         chessBoard = new ChessBoard(other.chessBoard);
         teamTurn = other.teamTurn;
+        whiteKingHasMoved = other.whiteKingHasMoved;
+        whiteLeftRookHasMoved = other.whiteLeftRookHasMoved;
+        whiteRightRookHasMoved = other.whiteRightRookHasMoved;
+        blackKingHasMoved = other.blackKingHasMoved;
+        blackLeftRookHasMoved = other.blackLeftRookHasMoved;
+        blackRightRookHasMoved = other.blackRightRookHasMoved;
+        lastWhitePawnToDoubleMove = other.lastWhitePawnToDoubleMove;
+        lastBlackPawnToDoubleMove = other.lastBlackPawnToDoubleMove;
     }
 
     /**

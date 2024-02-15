@@ -13,8 +13,8 @@ public abstract class DataAccess {
     public abstract AuthData getAuth(String authToken) throws DataAccessException;
     public abstract void deleteAuth(AuthData authData) throws DataAccessException;
     public abstract Collection<GameData> listGames() throws DataAccessException;
-    public abstract GameData insertGame(GameData gameData) throws DataAccessException;
+    public abstract void insertGame(GameData gameData) throws DataAccessException;
     public abstract GameData getGame(int gameID) throws DataAccessException;
-    public abstract GameData updateGame(int gameID, GameData gameData) throws DataAccessException;
+    public abstract void updateGame(int gameID, GameData gameData) throws DataAccessException;
     public abstract void clear();
 }

@@ -1,4 +1,4 @@
 package chess.dataModel.request;
 
-public record CreateGameRequest(String authToken, String gameName)  {
+public record CreateGameRequest(String gameName)  {
 }

@@ -63,11 +63,8 @@ public class MemoryDataAccess extends DataAccess {
     }
 
     @Override
-    public GameData insertGame(GameData gameData) {
-        /*GameData newGame = new GameData(
-
-        )*/
-        return null;
+    public void insertGame(GameData gameData) {
+        games.add(gameData);
     }
 
     @Override
@@ -81,8 +78,14 @@ public class MemoryDataAccess extends DataAccess {
     }
 
     @Override
-    public GameData updateGame(int gameID, GameData gameData) {
-        throw new RuntimeException("Not implemented");
+    public void updateGame(int gameID, GameData gameData) {
+        for (var game: games) {
+            if (game.gameID() == gameID) {
+                games.remove(game);
+                break;
+            }
+        }
+        games.add(gameData);
     }
 
     @Override
