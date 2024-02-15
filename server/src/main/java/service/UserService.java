@@ -15,6 +15,11 @@ import java.util.Base64;
 import java.util.Objects;
 
 public class UserService extends Service {
+    private static final UserService INSTANCE = new UserService();
+    private UserService() {}
+    public static UserService getInstance() {
+        return INSTANCE;
+    }
     private final SecureRandom secureRandom = new SecureRandom();
     private final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
     private String createAuthToken() {

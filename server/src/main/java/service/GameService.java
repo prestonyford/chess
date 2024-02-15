@@ -12,6 +12,12 @@ import service.exceptions.ServiceException;
 import java.util.Objects;
 
 public class GameService extends Service {
+    private static final GameService INSTANCE = new GameService();
+    private GameService() {}
+    public static GameService getInstance() {
+        return INSTANCE;
+    }
+
     public static class IDGen {
         private static int latestID = 1;
         public static int newID() {

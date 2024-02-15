@@ -24,9 +24,9 @@ public class Server {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
-        UserService userService = new UserService();
-        GameService gameService = new GameService();
-        ApplicationService applicationService = new ApplicationService();
+        UserService userService = UserService.getInstance();
+        GameService gameService = GameService.getInstance();
+        ApplicationService applicationService = ApplicationService.getInstance();
 
         // Register your endpoints and handle exceptions here.
 
