@@ -10,7 +10,9 @@ import chess.dataModel.response.ListGamesResponse;
 import dataAccess.DataAccessException;
 import service.exceptions.ServiceException;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 public class GameService extends Service {
@@ -51,9 +53,9 @@ public class GameService extends Service {
 
     public void joinGame(String authToken, JoinGameRequest joinGameRequest) throws ServiceException, DataAccessException {
         verifyAuthToken(authToken);
-        verifyRequestFields(joinGameRequest);
-        AuthData auth = db.getAuth(authToken);
+        verifyRequestFields(joinGameRequest, List.of("playerColor"));
 
+        AuthData auth = db.getAuth(authToken);
         GameData gameData = db.getGame(joinGameRequest.gameID());
         GameData updatedGame;
 
@@ -81,7 +83,8 @@ public class GameService extends Service {
                     new ChessGame(gameData.game())
             );
         } else {
-            throw new ServiceException(400, "Error: bad request");
+            // User is an observer, add functionality in phase 6
+            updatedGame = gameData;
         }
         db.updateGame(gameData.gameID(), updatedGame);
     }
