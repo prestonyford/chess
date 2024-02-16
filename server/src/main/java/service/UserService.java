@@ -15,13 +15,18 @@ import java.util.Objects;
 
 public class UserService extends Service {
     private static final UserService INSTANCE = new UserService();
-    private UserService() {}
+
+    private UserService() {
+    }
+
     public static UserService getInstance() {
         return INSTANCE;
     }
+
     private static class AuthTokenGen {
         private static final SecureRandom secureRandom = new SecureRandom();
         private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
+
         public static String createAuthToken() {
             byte[] randomBytes = new byte[24];
             secureRandom.nextBytes(randomBytes);
@@ -29,14 +34,8 @@ public class UserService extends Service {
         }
     }
 
-    public RegisterResponse register(RegisterRequest registerRequest) throws ServiceException, DataAccessException {
-        for (var field: new String[]
-                {registerRequest.username(), registerRequest.password(), registerRequest.email()}
-        ) {
-            if (field == null || field.isEmpty()) {
-                throw new ServiceException(400, "Error: bad request");
-            }
-        }
+    public RegisterResponse register(RegisterRequest registerRequest) throws ServiceException {
+        verifyRequestFields(registerRequest);
         if (db.getUser(registerRequest.username()) != null) {
             throw new ServiceException(403, "Error: already taken");
         }
@@ -46,7 +45,8 @@ public class UserService extends Service {
         db.insertAuth(authData);
         return new RegisterResponse(authData.username(), authData.authToken());
     }
-    public LoginResponse login(LoginRequest loginRequest) throws ServiceException, DataAccessException {
+
+    public LoginResponse login(LoginRequest loginRequest) throws ServiceException {
         UserData user = db.getUser(loginRequest.username());
         if (user == null || !Objects.equals(user.password(), loginRequest.password())) {
             throw new ServiceException(401, "Error: unauthorized");
@@ -56,11 +56,10 @@ public class UserService extends Service {
         db.insertAuth(authData);
         return new LoginResponse(authData.username(), authData.authToken());
     }
-    public void logout(String authToken) throws ServiceException, DataAccessException {
+
+    public void logout(String authToken) throws ServiceException {
+        verifyAuthToken(authToken);
         AuthData authData = db.getAuth(authToken);
-        if (authData == null) {
-            throw new ServiceException(401, "Error: unauthorized");
-        }
         db.deleteAuth(authData);
     }
 }

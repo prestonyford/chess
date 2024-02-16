@@ -6,6 +6,7 @@ import chess.dataModel.GameData;
 import chess.dataModel.request.CreateGameRequest;
 import chess.dataModel.request.JoinGameRequest;
 import chess.dataModel.response.CreateGameResponse;
+import chess.dataModel.response.ListGamesResponse;
 import dataAccess.DataAccessException;
 import service.exceptions.ServiceException;
 
@@ -13,25 +14,25 @@ import java.util.Objects;
 
 public class GameService extends Service {
     private static final GameService INSTANCE = new GameService();
-    private GameService() {}
+
+    private GameService() {
+    }
+
     public static GameService getInstance() {
         return INSTANCE;
     }
 
     public static class IDGen {
         private static int latestID = 1;
+
         public static int newID() {
             return latestID++;
         }
     }
-    public CreateGameResponse createGame(String authToken, CreateGameRequest createGameRequest) throws ServiceException, DataAccessException {
-        AuthData auth = db.getAuth(authToken);
-        if (auth == null) {
-            throw new ServiceException(401, "Error: unauthorized");
-        }
-        if (createGameRequest.gameName() == null || createGameRequest.gameName().isEmpty()) {
-            throw new ServiceException(400, "Error: bad request");
-        }
+
+    public CreateGameResponse createGame(String authToken, CreateGameRequest createGameRequest) throws ServiceException {
+        verifyAuthToken(authToken);
+        verifyRequestFields(createGameRequest);
 
         // Create the game
         GameData newGame = new GameData(
@@ -46,16 +47,16 @@ public class GameService extends Service {
 
         return new CreateGameResponse(newGame.gameID());
     }
+
     public void joinGame(String authToken, JoinGameRequest joinGameRequest) throws ServiceException, DataAccessException {
+        verifyAuthToken(authToken);
+        verifyRequestFields(joinGameRequest);
         AuthData auth = db.getAuth(authToken);
-        if (auth == null) {
-            throw new ServiceException(401, "Error: unauthorized");
-        }
-        if (joinGameRequest.gameID() == 0) {
-            throw new ServiceException(400, "Error: bad request");
-        }
+
         GameData gameData = db.getGame(joinGameRequest.gameID());
         GameData updatedGame;
+
+        // TODO: REMOVE DUPLICATION
         if (Objects.equals(joinGameRequest.playerColor(), "WHITE")) {
             if (gameData.whiteUsername() != null) {
                 throw new ServiceException(403, "Error: already taken");
@@ -67,8 +68,7 @@ public class GameService extends Service {
                     gameData.gameName(),
                     new ChessGame(gameData.game())
             );
-        }
-        else if (Objects.equals(joinGameRequest.playerColor(), "BLACK")) {
+        } else if (Objects.equals(joinGameRequest.playerColor(), "BLACK")) {
             if (gameData.blackUsername() != null) {
                 throw new ServiceException(403, "Error: already taken");
             }
@@ -79,10 +79,14 @@ public class GameService extends Service {
                     gameData.gameName(),
                     new ChessGame(gameData.game())
             );
-        }
-        else {
+        } else {
             throw new ServiceException(400, "Error: bad request");
         }
         db.updateGame(gameData.gameID(), updatedGame);
+    }
+
+    public ListGamesResponse listGames(String authToken) throws ServiceException {
+        verifyAuthToken(authToken);
+        return null;
     }
 }

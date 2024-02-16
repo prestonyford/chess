@@ -5,6 +5,7 @@ import chess.dataModel.request.JoinGameRequest;
 import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.CreateGameResponse;
+import chess.dataModel.response.ListGamesResponse;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import com.google.gson.Gson;
@@ -90,6 +91,11 @@ public class Server {
             res.status(200);
             res.body("");
             return "";
+        });
+
+        Spark.get("/game", (req, res) -> {
+            // ListGamesResponse listGamesResponse = gameService.
+            return null;
         });
 
         Spark.awaitInitialization();
