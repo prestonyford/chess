@@ -94,8 +94,12 @@ public class Server {
         });
 
         Spark.get("/game", (req, res) -> {
-            // ListGamesResponse listGamesResponse = gameService.
-            return null;
+            ListGamesResponse listGamesResponse = gameService.listGames(req.headers("Authorization"));
+            res.status(200);
+            res.type("application/json");
+            String body = new Gson().toJson(listGamesResponse);
+            res.body(body);
+            return body;
         });
 
         Spark.awaitInitialization();

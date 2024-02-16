@@ -10,6 +10,7 @@ import chess.dataModel.response.ListGamesResponse;
 import dataAccess.DataAccessException;
 import service.exceptions.ServiceException;
 
+import java.util.Collection;
 import java.util.Objects;
 
 public class GameService extends Service {
@@ -87,6 +88,6 @@ public class GameService extends Service {
 
     public ListGamesResponse listGames(String authToken) throws ServiceException {
         verifyAuthToken(authToken);
-        return null;
+        return new ListGamesResponse(db.listGames().toArray(new GameData[0]));
     }
 }

@@ -15,7 +15,7 @@ public class MemoryDataAccess extends DataAccess {
 
     @Override
     public UserData getUser(String username) {
-        for (var user: users) {
+        for (var user : users) {
             if (Objects.equals(user.username(), username)) {
                 return user;
             }
@@ -44,7 +44,7 @@ public class MemoryDataAccess extends DataAccess {
 
     @Override
     public AuthData getAuth(String authToken) {
-        for (var auth: auths) {
+        for (var auth : auths) {
             if (Objects.equals(auth.authToken(), authToken)) {
                 return auth;
             }
@@ -59,7 +59,7 @@ public class MemoryDataAccess extends DataAccess {
 
     @Override
     public Collection<GameData> listGames() {
-        throw new RuntimeException("Not implemented");
+        return games;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class MemoryDataAccess extends DataAccess {
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        for (var game: games) {
+        for (var game : games) {
             if (game.gameID() == gameID) {
                 return game;
             }
@@ -79,7 +79,7 @@ public class MemoryDataAccess extends DataAccess {
 
     @Override
     public void updateGame(int gameID, GameData gameData) {
-        for (var game: games) {
+        for (var game : games) {
             if (game.gameID() == gameID) {
                 games.remove(game);
                 break;
