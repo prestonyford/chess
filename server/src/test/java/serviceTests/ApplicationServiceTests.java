@@ -41,9 +41,7 @@ public class ApplicationServiceTests {
         // Assert that the user and auth was removed
         assertThrows(
                 ServiceException.class,
-                () -> {
-                    userService.login(new LoginRequest("Steve", "Steve's password"));
-                },
+                () -> userService.login(new LoginRequest("Steve", "Steve's password")),
                 "Expected login to throw ServiceException with Error: unauthorized, but it didn't"
         );
 
