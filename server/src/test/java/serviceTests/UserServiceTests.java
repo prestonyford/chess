@@ -4,17 +4,17 @@ import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import passoffTests.testClasses.TestException;
 import service.UserService;
 import service.exceptions.ServiceException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserServiceTests {
     private final UserService userService = UserService.getInstance();
+    int test = 0;
 
     @Test
     @Order(1)
@@ -81,6 +81,8 @@ public class UserServiceTests {
     @Order(5)
     @DisplayName("Login with bad password")
     public void badLoginPassword() throws TestException {
+        test = 1;
+        System.out.println(test);
         try {
             // Bad password
             assertThrows(
@@ -90,6 +92,37 @@ public class UserServiceTests {
             );
         } catch (Exception ex) {
             throw new TestException("Could not login");
+        }
+    }
+
+    @Test
+    @Order(6)
+    @DisplayName("Logout")
+    public void logout() throws TestException {
+        System.out.println(test);
+        try {
+            LoginResponse loginResponse = userService.login(new LoginRequest("pyford", "i_love_cs240"));
+            userService.logout(loginResponse.authToken());
+        } catch (Exception ex) {
+            throw new TestException("Could not logout");
+        }
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("Logout with bad authToken")
+    public void badLogout() throws TestException {
+        System.out.println(test);
+        try {
+            LoginResponse loginResponse = userService.login(new LoginRequest("pyford", "i_love_cs240"));
+            userService.logout(loginResponse.authToken());
+            assertThrows(
+                    ServiceException.class,
+                    () -> userService.logout(loginResponse.authToken()),
+                    "authToken is still valid after logout when it shouldn't be"
+            );
+        } catch (Exception ex) {
+            throw new TestException("Could not logout");
         }
     }
 }
