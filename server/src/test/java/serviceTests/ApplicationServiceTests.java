@@ -27,7 +27,11 @@ public class ApplicationServiceTests {
 
         // Add a user
         try {
-            RegisterResponse registerResponse = userService.register(new RegisterRequest("Steve", "Steve's password", "steve@email.com"));
+            RegisterResponse registerResponse = userService.register(new RegisterRequest(
+                    "Steve",
+                    "Steve's password",
+                    "steve@email.com")
+            );
             gameService.createGame(registerResponse.authToken(), new CreateGameRequest("Steve's chess game"));
             gameService.createGame(registerResponse.authToken(), new CreateGameRequest("Steve's chess game 2"));
             userService.logout(registerResponse.authToken());

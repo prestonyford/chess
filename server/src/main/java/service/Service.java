@@ -38,7 +38,7 @@ public abstract class Service {
                 // Check if the field is its default value; null for strings, 0 for ints
                 if (
                         value == null ||
-                                String.valueOf(request).isEmpty() ||
+                                String.valueOf(value).isEmpty() ||
                                 (value instanceof Integer && (Integer) value == 0)
                 ) {
                     throw new ServiceException(400, "Error: bad request");
