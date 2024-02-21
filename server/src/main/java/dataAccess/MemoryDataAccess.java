@@ -77,7 +77,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public GameData getGame(int gameID) throws DataAccessException {
+    public GameData getGame(int gameID) {
         for (var game : games) {
             if (game.gameID() == gameID) {
                 return game;

@@ -30,7 +30,7 @@ public class GameService extends Service {
         }
     }
 
-    public CreateGameResponse createGame(String authToken, CreateGameRequest createGameRequest) throws ServiceException {
+    public CreateGameResponse createGame(String authToken, CreateGameRequest createGameRequest) throws ServiceException, DataAccessException {
         verifyAuthToken(authToken);
         verifyRequestFields(createGameRequest);
 
@@ -59,7 +59,6 @@ public class GameService extends Service {
         GameData gameData = db.getGame(joinGameRequest.gameID());
         GameData updatedGame;
 
-        // TODO: REMOVE DUPLICATION
         if (Objects.equals(joinGameRequest.playerColor(), "WHITE")) {
             if (gameData.whiteUsername() != null) {
                 throw new ServiceException(403, "Error: already taken");
@@ -89,7 +88,7 @@ public class GameService extends Service {
         db.updateGame(gameData.gameID(), updatedGame);
     }
 
-    public ListGamesResponse listGames(String authToken) throws ServiceException {
+    public ListGamesResponse listGames(String authToken) throws ServiceException, DataAccessException {
         verifyAuthToken(authToken);
         return new ListGamesResponse(db.listGames().toArray(new GameData[0]));
     }

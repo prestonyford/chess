@@ -6,6 +6,7 @@ import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
+import dataAccess.DataAccessException;
 import service.exceptions.ServiceException;
 
 import java.security.SecureRandom;
@@ -33,7 +34,7 @@ public class UserService extends Service {
         }
     }
 
-    public RegisterResponse register(RegisterRequest registerRequest) throws ServiceException {
+    public RegisterResponse register(RegisterRequest registerRequest) throws ServiceException, DataAccessException {
         verifyRequestFields(registerRequest);
         if (db.getUser(registerRequest.username()) != null) {
             throw new ServiceException(403, "Error: already taken");
@@ -45,7 +46,7 @@ public class UserService extends Service {
         return new RegisterResponse(authData.username(), authData.authToken());
     }
 
-    public LoginResponse login(LoginRequest loginRequest) throws ServiceException {
+    public LoginResponse login(LoginRequest loginRequest) throws ServiceException, DataAccessException {
         UserData user = db.getUser(loginRequest.username());
         if (user == null || !Objects.equals(user.password(), loginRequest.password())) {
             throw new ServiceException(401, "Error: unauthorized");
@@ -56,7 +57,7 @@ public class UserService extends Service {
         return new LoginResponse(authData.username(), authData.authToken());
     }
 
-    public void logout(String authToken) throws ServiceException {
+    public void logout(String authToken) throws ServiceException, DataAccessException {
         verifyAuthToken(authToken);
         AuthData authData = db.getAuth(authToken);
         db.deleteAuth(authData);
