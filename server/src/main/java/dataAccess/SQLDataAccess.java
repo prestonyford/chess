@@ -6,7 +6,16 @@ import chess.dataModel.UserData;
 
 import java.util.Collection;
 
-public class SQLDataAccess extends DataAccess {
+public class SQLDataAccess implements DataAccess {
+    private static final SQLDataAccess INSTANCE = new SQLDataAccess();
+
+    private SQLDataAccess() {
+    }
+
+    public static SQLDataAccess getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public UserData getUser(String username) {
         throw new RuntimeException("Not implemented");
@@ -23,7 +32,9 @@ public class SQLDataAccess extends DataAccess {
     }
 
     @Override
-    public AuthData getAuth(String authToken) { throw new RuntimeException("Not implemented"); }
+    public AuthData getAuth(String authToken) {
+        throw new RuntimeException("Not implemented");
+    }
 
     @Override
     public void deleteAuth(AuthData authData) {

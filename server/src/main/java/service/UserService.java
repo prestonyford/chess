@@ -6,11 +6,9 @@ import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
-import dataAccess.DataAccessException;
 import service.exceptions.ServiceException;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Objects;
 

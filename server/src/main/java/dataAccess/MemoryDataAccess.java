@@ -8,10 +8,19 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 
-public class MemoryDataAccess extends DataAccess {
-    private HashSet<UserData> users = new HashSet<>();
-    private HashSet<AuthData> auths = new HashSet<>();
-    private HashSet<GameData> games = new HashSet<>();
+public class MemoryDataAccess implements DataAccess {
+    private final HashSet<UserData> users = new HashSet<>();
+    private final HashSet<AuthData> auths = new HashSet<>();
+    private final HashSet<GameData> games = new HashSet<>();
+
+    private static final MemoryDataAccess INSTANCE = new MemoryDataAccess();
+
+    private MemoryDataAccess() {
+    }
+
+    public static MemoryDataAccess getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public UserData getUser(String username) {

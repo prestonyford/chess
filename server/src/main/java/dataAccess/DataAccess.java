@@ -6,15 +6,24 @@ import chess.dataModel.UserData;
 
 import java.util.Collection;
 
-public abstract class DataAccess {
-    public abstract UserData getUser(String username) throws DataAccessException;
-    public abstract void createUser(UserData userData) throws DataAccessException;
-    public abstract void insertAuth(AuthData authData) throws DataAccessException;
-    public abstract AuthData getAuth(String authToken) throws DataAccessException;
-    public abstract void deleteAuth(AuthData authData) throws DataAccessException;
-    public abstract Collection<GameData> listGames() throws DataAccessException;
-    public abstract void insertGame(GameData gameData) throws DataAccessException;
-    public abstract GameData getGame(int gameID) throws DataAccessException;
-    public abstract void updateGame(int gameID, GameData gameData) throws DataAccessException;
-    public abstract void clear();
+public interface DataAccess {
+    UserData getUser(String username) throws DataAccessException;
+
+    void createUser(UserData userData) throws DataAccessException;
+
+    void insertAuth(AuthData authData) throws DataAccessException;
+
+    AuthData getAuth(String authToken) throws DataAccessException;
+
+    void deleteAuth(AuthData authData) throws DataAccessException;
+
+    Collection<GameData> listGames() throws DataAccessException;
+
+    void insertGame(GameData gameData) throws DataAccessException;
+
+    GameData getGame(int gameID) throws DataAccessException;
+
+    void updateGame(int gameID, GameData gameData) throws DataAccessException;
+
+    void clear();
 }

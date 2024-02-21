@@ -10,9 +10,6 @@ import chess.dataModel.response.ListGamesResponse;
 import dataAccess.DataAccessException;
 import service.exceptions.ServiceException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 public class GameService extends Service {

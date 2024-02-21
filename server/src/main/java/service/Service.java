@@ -1,18 +1,20 @@
 package service;
 
 import chess.dataModel.AuthData;
-import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
 import service.exceptions.ServiceException;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
 
 public abstract class Service {
     // Derived classes are all singletons as they share the database.
-    protected static MemoryDataAccess db = new MemoryDataAccess();
+    protected static MemoryDataAccess db = MemoryDataAccess.getInstance();
 
+    /**
+     * Throws a ServiceException if the auth token is not valid in the database.
+     *
+     * @param authToken The auth token for verifying.
+     */
     protected static void verifyAuthToken(String authToken) throws ServiceException {
         AuthData auth = db.getAuth(authToken);
         if (auth == null) {
