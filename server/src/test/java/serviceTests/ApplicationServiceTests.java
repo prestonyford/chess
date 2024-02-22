@@ -28,14 +28,14 @@ public class ApplicationServiceTests {
         // Add a user
         try {
             RegisterResponse registerResponse = userService.register(new RegisterRequest(
-                    "Steve",
-                    "Steve's password",
-                    "steve@email.com")
+                    "Navia",
+                    "Navia's password",
+                    "navia@email.com")
             );
-            gameService.createGame(registerResponse.authToken(), new CreateGameRequest("Steve's chess game"));
-            gameService.createGame(registerResponse.authToken(), new CreateGameRequest("Steve's chess game 2"));
+            gameService.createGame(registerResponse.authToken(), new CreateGameRequest("Navia's chess game"));
+            gameService.createGame(registerResponse.authToken(), new CreateGameRequest("Navia's chess game 2"));
             userService.logout(registerResponse.authToken());
-            userService.login(new LoginRequest("Steve", "Steve's password"));
+            userService.login(new LoginRequest("Navia", "Navia's password"));
         } catch (Exception ex) {
             throw new TestException("Could not add data to database");
         }
@@ -45,7 +45,7 @@ public class ApplicationServiceTests {
         // Assert that the user and auth was removed
         assertThrows(
                 ServiceException.class,
-                () -> userService.login(new LoginRequest("Steve", "Steve's password")),
+                () -> userService.login(new LoginRequest("Navia", "Navia's password")),
                 "Expected login to throw ServiceException with Error: unauthorized, but it didn't"
         );
 
