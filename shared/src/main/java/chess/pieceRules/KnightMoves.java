@@ -16,7 +16,7 @@ public class KnightMoves extends PieceMoves {
     @Override
     public Collection<ChessMove> getMoves() {
         HashSet<ChessMove> moves = new HashSet<>();
-        for (var move: new int[][] {
+        for (var move : new int[][]{
                 {pos.getRow() + 2, pos.getColumn() - 1},
                 {pos.getRow() + 2, pos.getColumn() + 1},
                 {pos.getRow() + 1, pos.getColumn() - 2},
@@ -27,10 +27,7 @@ public class KnightMoves extends PieceMoves {
                 {pos.getRow() - 2, pos.getColumn() + 1}
         }) {
             ChessPosition endPosition = new ChessPosition(move[0], move[1]);
-            if (
-                    !ChessBoard.validTile(endPosition) ||
-                    (board.getPiece(endPosition) != null && board.getPiece(endPosition).getTeamColor() == color)
-            ) {
+            if (invalidTargetTile(endPosition)) {
                 continue;
             }
             moves.add(new ChessMove(pos, endPosition, null));

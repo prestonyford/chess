@@ -12,6 +12,7 @@ public abstract class PieceMoves {
     protected ChessBoard board;
     protected ChessPosition pos;
     protected ChessGame.TeamColor color;
+
     public PieceMoves(ChessBoard board, ChessPosition pos, ChessGame.TeamColor color) {
         this.board = board;
         this.pos = pos;
@@ -38,6 +39,11 @@ public abstract class PieceMoves {
             col += direction[1];
         }
         return moves;
+    }
+
+    protected boolean invalidTargetTile(ChessPosition endPosition) {
+        return !ChessBoard.validTile(endPosition) ||
+                (board.getPiece(endPosition) != null && board.getPiece(endPosition).getTeamColor() == color);
     }
 
     public abstract Collection<ChessMove> getMoves();
