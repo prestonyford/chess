@@ -1,10 +1,13 @@
 package serviceTests;
 
+import chess.ChessGame;
+import chess.dataModel.GameData;
 import chess.dataModel.request.CreateGameRequest;
 import chess.dataModel.request.JoinGameRequest;
 import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.CreateGameResponse;
+import chess.dataModel.response.ListGamesResponse;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import org.junit.jupiter.api.*;
@@ -102,6 +105,32 @@ public class GameServiceTests {
     @Order(5)
     @DisplayName("List games")
     public void listGames() throws TestException {
-        
+        try {
+            ListGamesResponse listGamesResponse = gameService.listGames(registerResponse.authToken());
+            assertArrayEquals(
+                    new GameData[]{new GameData(
+                            createGameResponse.gameID(),
+                            "Steve",
+                            null,
+                            "gameA",
+                            new ChessGame()
+                    )},
+                    listGamesResponse.games(),
+                    "listGames returned something unexpected"
+            );
+        } catch (Exception ex) {
+            throw new TestException("Could not call listGames (bad authToken?)");
+        }
+    }
+
+    @Test
+    @Order(6)
+    @DisplayName("List games with bad authToken")
+    public void badListGames() throws TestException {
+        assertThrows(
+                ServiceException.class,
+                () -> gameService.listGames(""),
+                "Expected unauthorized exception but didn't get one"
+        );
     }
 }
