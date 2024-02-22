@@ -16,17 +16,16 @@ public class KnightMoves extends PieceMoves {
     @Override
     public Collection<ChessMove> getMoves() {
         HashSet<ChessMove> moves = new HashSet<>();
-        for (var move : new int[][]{
-                {pos.getRow() + 2, pos.getColumn() - 1},
-                {pos.getRow() + 2, pos.getColumn() + 1},
-                {pos.getRow() + 1, pos.getColumn() - 2},
-                {pos.getRow() + 1, pos.getColumn() + 2},
-                {pos.getRow() - 1, pos.getColumn() - 2},
-                {pos.getRow() - 1, pos.getColumn() + 2},
-                {pos.getRow() - 2, pos.getColumn() - 1},
-                {pos.getRow() - 2, pos.getColumn() + 1}
+        for (var endPosition : new ChessPosition[]{
+                new ChessPosition(pos.getRow() + 2, pos.getColumn() - 1),
+                new ChessPosition(pos.getRow() + 2, pos.getColumn() + 1),
+                new ChessPosition(pos.getRow() + 1, pos.getColumn() - 2),
+                new ChessPosition(pos.getRow() + 1, pos.getColumn() + 2),
+                new ChessPosition(pos.getRow() - 1, pos.getColumn() - 2),
+                new ChessPosition(pos.getRow() - 1, pos.getColumn() + 2),
+                new ChessPosition(pos.getRow() - 2, pos.getColumn() - 1),
+                new ChessPosition(pos.getRow() - 2, pos.getColumn() + 1)
         }) {
-            ChessPosition endPosition = new ChessPosition(move[0], move[1]);
             if (invalidTargetTile(endPosition)) {
                 continue;
             }

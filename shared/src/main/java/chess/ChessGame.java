@@ -188,13 +188,10 @@ public class ChessGame {
                 legalMoves.add(move);
             }
         }
-
         // Castling
         legalMoves.addAll(validCastlingMoves(startPosition, piece, pieceColor));
-
         // En Passant
         legalMoves.addAll(validEnPassantMoves(startPosition, piece));
-
         return legalMoves;
     }
 
@@ -294,7 +291,6 @@ public class ChessGame {
 
         // Move piece
         chessBoard.movePiece(move);
-
         // Swap team color
         this.teamTurn = this.teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
     }
@@ -384,7 +380,6 @@ public class ChessGame {
                 }
             }
         }
-
         return true;
     }
 
@@ -414,7 +409,6 @@ public class ChessGame {
         whiteRightRookHasMoved = board.getPiece(whiteRightRookPos) == null ||
                 board.getPiece(whiteRightRookPos).getPieceType() != ChessPiece.PieceType.ROOK ||
                 board.getPiece(whiteRightRookPos).getTeamColor() != TeamColor.WHITE;
-
 
         blackKingHasMoved = board.getPiece(blackKingPos) == null ||
                 board.getPiece(blackKingPos).getPieceType() != ChessPiece.PieceType.KING ||
@@ -463,15 +457,11 @@ public class ChessGame {
     private boolean doesMoveCauseCheck(ChessMove move, TeamColor teamColor) {
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
-
         ChessPiece startPositionPiece = chessBoard.getPiece(startPosition);
         ChessPiece endPositionPiece = chessBoard.getPiece(endPosition);
-
-        // Make the move but don't promote
+        // Make the move
         chessBoard.movePiece(move);
-
         boolean res = isInCheck(teamColor);
-
         // Revert the move
         chessBoard.addPiece(startPosition, startPositionPiece);
         chessBoard.addPiece(endPosition, endPositionPiece);
@@ -482,10 +472,9 @@ public class ChessGame {
     private boolean doesMoveCausePositionDanger(ChessMove move, ChessPosition piecePosition, TeamColor teamColor) {
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
-
         ChessPiece startPositionPiece = chessBoard.getPiece(startPosition);
         ChessPiece endPositionPiece = chessBoard.getPiece(endPosition);
-
+        // Make the move
         chessBoard.movePiece(move);
         boolean res = isInDanger(piecePosition, teamColor);
         // Revert the move
