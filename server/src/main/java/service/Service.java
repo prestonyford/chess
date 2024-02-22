@@ -24,7 +24,7 @@ public abstract class Service {
     }
 
     /**
-     * Throws a ServiceException if there exists a field of the given object that is either null or its default value.
+     * Throws a ServiceException if there exists a field of the given object that is an empty/null string or an int that is 0
      *
      * @param request The request object for fields checking.
      */
