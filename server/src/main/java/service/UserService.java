@@ -6,6 +6,7 @@ import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
+import dataAccess.DataAccess;
 import dataAccess.DataAccessException;
 import service.exceptions.ServiceException;
 
@@ -14,13 +15,8 @@ import java.util.Base64;
 import java.util.Objects;
 
 public class UserService extends Service {
-    private static final UserService INSTANCE = new UserService();
-
-    private UserService() {
-    }
-
-    public static UserService getInstance() {
-        return INSTANCE;
+    public UserService(DataAccess db) {
+        super(db);
     }
 
     private static class AuthTokenGen {

@@ -7,14 +7,6 @@ import chess.dataModel.UserData;
 import java.util.Collection;
 
 public class SQLDataAccess implements DataAccess {
-    private static final SQLDataAccess INSTANCE = new SQLDataAccess();
-
-    private SQLDataAccess() {
-    }
-
-    public static SQLDataAccess getInstance() {
-        return INSTANCE;
-    }
 
     @Override
     public UserData getUser(String username) {

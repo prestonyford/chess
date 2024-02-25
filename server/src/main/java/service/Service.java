@@ -9,14 +9,18 @@ import service.exceptions.ServiceException;
 import java.lang.reflect.Field;
 
 public abstract class Service {
-    protected static DataAccess db = MemoryDataAccess.getInstance();
+    protected DataAccess db;
+
+    public Service(DataAccess db) {
+        this.db = db;
+    }
 
     /**
      * Throws a ServiceException if the auth token is not valid in the database.
      *
      * @param authToken The auth token for verifying.
      */
-    protected static void verifyAuthToken(String authToken) throws ServiceException, DataAccessException {
+    protected void verifyAuthToken(String authToken) throws ServiceException, DataAccessException {
         AuthData auth = db.getAuth(authToken);
         if (auth == null) {
             throw new ServiceException(401, "Error: unauthorized");

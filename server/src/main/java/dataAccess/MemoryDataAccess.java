@@ -13,15 +13,6 @@ public class MemoryDataAccess implements DataAccess {
     private final HashSet<AuthData> auths = new HashSet<>();
     private final HashSet<GameData> games = new HashSet<>();
 
-    private static final MemoryDataAccess INSTANCE = new MemoryDataAccess();
-
-    private MemoryDataAccess() {
-    }
-
-    public static MemoryDataAccess getInstance() {
-        return INSTANCE;
-    }
-
     @Override
     public UserData getUser(String username) {
         for (var user : users) {

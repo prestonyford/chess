@@ -1,13 +1,10 @@
 package service;
 
+import dataAccess.DataAccess;
+
 public class ApplicationService extends Service {
-    private static final ApplicationService INSTANCE = new ApplicationService();
-
-    private ApplicationService() {
-    }
-
-    public static ApplicationService getInstance() {
-        return INSTANCE;
+    public ApplicationService(DataAccess db) {
+        super(db);
     }
 
     public void bigRedButton() {

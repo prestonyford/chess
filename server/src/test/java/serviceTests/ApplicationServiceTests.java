@@ -7,6 +7,8 @@ import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.ListGamesResponse;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
+import dataAccess.DataAccess;
+import dataAccess.MemoryDataAccess;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import passoffTests.testClasses.TestException;
@@ -18,13 +20,14 @@ import service.exceptions.ServiceException;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationServiceTests {
+    private static final DataAccess db = new MemoryDataAccess();
+    private static final UserService userService = new UserService(db);
+    private static final GameService gameService = new GameService(db);
+    private static final ApplicationService applicationService = new ApplicationService(db);
+
     @Test
     @DisplayName("Clear database")
     public void clearDatabase() {
-        var userService = UserService.getInstance();
-        var gameService = GameService.getInstance();
-        var applicationService = ApplicationService.getInstance();
-
         // Add a user
         try {
             RegisterResponse registerResponse = userService.register(new RegisterRequest(

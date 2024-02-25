@@ -7,19 +7,15 @@ import chess.dataModel.request.CreateGameRequest;
 import chess.dataModel.request.JoinGameRequest;
 import chess.dataModel.response.CreateGameResponse;
 import chess.dataModel.response.ListGamesResponse;
+import dataAccess.DataAccess;
 import dataAccess.DataAccessException;
 import service.exceptions.ServiceException;
 
 import java.util.Objects;
 
 public class GameService extends Service {
-    private static final GameService INSTANCE = new GameService();
-
-    private GameService() {
-    }
-
-    public static GameService getInstance() {
-        return INSTANCE;
+    public GameService(DataAccess db) {
+        super(db);
     }
 
     public static class IDGen {

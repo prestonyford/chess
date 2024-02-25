@@ -9,7 +9,9 @@ import chess.dataModel.response.ListGamesResponse;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import com.google.gson.Gson;
+import dataAccess.DataAccess;
 import dataAccess.DataAccessException;
+import dataAccess.MemoryDataAccess;
 import service.ApplicationService;
 import service.GameService;
 import service.UserService;
@@ -24,9 +26,11 @@ public class Server {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
-        UserService userService = UserService.getInstance();
-        GameService gameService = GameService.getInstance();
-        ApplicationService applicationService = ApplicationService.getInstance();
+        // Database and services
+        DataAccess db = new MemoryDataAccess();
+        UserService userService = new UserService(db);
+        GameService gameService = new GameService(db);
+        ApplicationService applicationService = new ApplicationService(db);
 
         // Handle all endpoint ServiceExceptions
         Spark.exception(ServiceException.class, (ex, req, res) -> {
