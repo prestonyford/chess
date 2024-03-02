@@ -5,7 +5,6 @@ import chess.dataModel.request.CreateGameRequest;
 import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.ListGamesResponse;
-import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
