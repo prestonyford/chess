@@ -6,6 +6,7 @@ import chess.dataModel.UserData;
 import service.exceptions.ServiceException;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 
@@ -68,14 +69,33 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public UserData getUser(String username) {
-        throw new RuntimeException("Not implemented");
+    public UserData getUser(String username) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT username, password, email FROM users WHERE username=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new UserData(
+                                rs.getString("username"),
+                                rs.getString("password"),
+                                rs.getString("email")
+                        );
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
     }
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
         var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
         executeUpdate(statement, userData.username(), userData.password(), userData.email());
+
     }
 
     @Override
