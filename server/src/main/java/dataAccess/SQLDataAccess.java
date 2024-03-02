@@ -95,7 +95,6 @@ public class SQLDataAccess implements DataAccess {
     public void createUser(UserData userData) throws DataAccessException {
         var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
         executeUpdate(statement, userData.username(), userData.password(), userData.email());
-
     }
 
     @Override
@@ -134,8 +133,9 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public void clear() {
-        throw new RuntimeException("Not implemented");
+    public void clear() throws DataAccessException {
+        String statement = "TRUNCATE users; TRUNCATE auths; TRUNCATE games;";
+        executeUpdate(statement);
     }
 
 

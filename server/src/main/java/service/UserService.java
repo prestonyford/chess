@@ -32,7 +32,8 @@ public class UserService extends Service {
 
     public RegisterResponse register(RegisterRequest registerRequest) throws ServiceException, DataAccessException {
         verifyRequestFields(registerRequest);
-        if (db.getUser(registerRequest.username()) != null) {
+        var user = db.getUser(registerRequest.username());
+        if (user != null) {
             throw new ServiceException(403, "Error: already taken");
         }
 

@@ -1,5 +1,3 @@
-package serviceTests.sql;
-
 import chess.ChessGame;
 import chess.dataModel.GameData;
 import chess.dataModel.request.CreateGameRequest;

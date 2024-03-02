@@ -25,5 +25,5 @@ public interface DataAccess {
 
     void updateGame(int gameID, GameData gameData) throws DataAccessException;
 
-    void clear();
+    void clear() throws DataAccessException;
 }

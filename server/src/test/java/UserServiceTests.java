@@ -1,5 +1,3 @@
-package serviceTests.sql;
-
 import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.LoginResponse;
@@ -32,7 +30,7 @@ public class UserServiceTests {
             );
             assertNotNull(registerResponse);
         } catch (Exception ex) {
-            throw new TestException("Could not register");
+            throw new TestException("Could not register: " + ex.getMessage());
         }
     }
 

@@ -1,5 +1,3 @@
-package serviceTests.memory;
-
 import chess.dataModel.GameData;
 import chess.dataModel.request.CreateGameRequest;
 import chess.dataModel.request.LoginRequest;
@@ -11,18 +9,17 @@ import dataAccess.MemoryDataAccess;
 import dataAccess.SQLDataAccess;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import passoffTests.testClasses.TestException;
 import service.ApplicationService;
 import service.GameService;
 import service.UserService;
 import service.exceptions.ServiceException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ApplicationServiceTests {
-    private static final DataAccess db = new MemoryDataAccess();
+    private static final DataAccess db = new SQLDataAccess();
     private static final UserService userService = new UserService(db);
     private static final GameService gameService = new GameService(db);
     private static final ApplicationService applicationService = new ApplicationService(db);
@@ -45,7 +42,12 @@ public class ApplicationServiceTests {
             throw new TestException("Could not add data to database");
         }
 
-        applicationService.bigRedButton();
+        try {
+            applicationService.bigRedButton();
+        } catch (Exception ex) {
+            throw new TestException("Could not clear database: " + ex.getMessage());
+        }
+
 
         // Assert that the user and auth was removed
         assertThrows(
