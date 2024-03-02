@@ -5,8 +5,12 @@ import chess.dataModel.GameData;
 import chess.dataModel.UserData;
 import service.exceptions.ServiceException;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
+
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+import static java.sql.Types.NULL;
 
 public class SQLDataAccess implements DataAccess {
 
@@ -58,9 +62,7 @@ public class SQLDataAccess implements DataAccess {
     public SQLDataAccess() {
         try {
             initializeDatabase();
-        } catch (DataAccessException ex) {
-            System.out.println("oopsie");
-        } catch (ServiceException ex) {
+        } catch (DataAccessException | ServiceException ex) {
             System.out.println(ex.getMessage());
         }
     }
@@ -71,8 +73,9 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public void createUser(UserData userData) {
-        throw new RuntimeException("Not implemented");
+    public void createUser(UserData userData) throws DataAccessException {
+        var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+        executeUpdate(statement, userData.username(), userData.password(), userData.email());
     }
 
     @Override
@@ -114,4 +117,30 @@ public class SQLDataAccess implements DataAccess {
     public void clear() {
         throw new RuntimeException("Not implemented");
     }
+
+
+    private int executeUpdate(String statement, Object... params) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                for (var i = 0; i < params.length; i++) {
+                    var param = params[i];
+                    if (param instanceof String p) ps.setString(i + 1, p);
+                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                        // else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
+                    else if (param == null) ps.setNull(i + 1, NULL);
+                }
+                ps.executeUpdate();
+
+                var rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+
+                return 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
+    }
+
 }

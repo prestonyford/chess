@@ -1,4 +1,4 @@
-package serviceTests;
+package serviceTests.sql;
 
 import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
@@ -6,17 +6,19 @@ import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
+import dataAccess.SQLDataAccess;
 import org.junit.jupiter.api.*;
 import passoffTests.testClasses.TestException;
 import service.GameService;
 import service.UserService;
 import service.exceptions.ServiceException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserServiceTests {
-    private static final DataAccess db = new MemoryDataAccess();
+    private static final DataAccess db = new SQLDataAccess();
     private static final UserService userService = new UserService(db);
     private static final GameService gameService = new GameService(db);
 

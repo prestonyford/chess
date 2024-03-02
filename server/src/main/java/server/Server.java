@@ -43,6 +43,7 @@ public class Server {
         // Handle all endpoint DataAccess exceptions
         Spark.exception(DataAccessException.class, (ex, req, res) -> {
             res.status(500);
+            res.body(ex.getMessage());
         });
 
         // Handle endpoints

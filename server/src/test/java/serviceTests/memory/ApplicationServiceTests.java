@@ -1,4 +1,4 @@
-package serviceTests;
+package serviceTests.memory;
 
 import chess.dataModel.GameData;
 import chess.dataModel.request.CreateGameRequest;
@@ -8,8 +8,11 @@ import chess.dataModel.response.ListGamesResponse;
 import chess.dataModel.response.RegisterResponse;
 import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
+import dataAccess.SQLDataAccess;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import passoffTests.testClasses.TestException;
 import service.ApplicationService;
 import service.GameService;

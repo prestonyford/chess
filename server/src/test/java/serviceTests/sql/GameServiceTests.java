@@ -1,29 +1,28 @@
-package serviceTests;
+package serviceTests.sql;
 
 import chess.ChessGame;
 import chess.dataModel.GameData;
 import chess.dataModel.request.CreateGameRequest;
 import chess.dataModel.request.JoinGameRequest;
-import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.CreateGameResponse;
 import chess.dataModel.response.ListGamesResponse;
-import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
+import dataAccess.SQLDataAccess;
 import org.junit.jupiter.api.*;
 import passoffTests.testClasses.TestException;
-import service.ApplicationService;
 import service.GameService;
 import service.UserService;
 import service.exceptions.ServiceException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GameServiceTests {
-    private static final DataAccess db = new MemoryDataAccess();
+    private static final DataAccess db = new SQLDataAccess();
     private static final UserService userService = new UserService(db);
     private static final GameService gameService = new GameService(db);
     private static RegisterResponse registerResponse;
