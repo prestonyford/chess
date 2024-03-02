@@ -134,8 +134,9 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public void clear() throws DataAccessException {
-        String statement = "TRUNCATE users; TRUNCATE auths; TRUNCATE games;";
-        executeUpdate(statement);
+        executeUpdate("TRUNCATE users;");
+        executeUpdate("TRUNCATE auths;");
+        executeUpdate("TRUNCATE games;");
     }
 
 
