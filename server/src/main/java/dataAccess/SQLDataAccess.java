@@ -13,27 +13,27 @@ public class SQLDataAccess implements DataAccess {
     private void initializeDatabase() throws DataAccessException, ServiceException {
         String initUsersTable = """
                 CREATE TABLE IF NOT EXISTS users (
-                    `username` varchar(256) NOT NULL,
-                    `password` varchar(256) NOT NULL,
-                    `email` varchar(256) NOT NULL,
-                    PRIMARY KEY (`username`)
+                    username varchar(256) NOT NULL,
+                    password varchar(256) NOT NULL,
+                    email varchar(256) NOT NULL,
+                    PRIMARY KEY (username)
                 );
                 """;
         String initAuthsTable = """
                 CREATE TABLE IF NOT EXISTS auths (
-                    'username' varchar(256) NOT NULL,
-                    `authToken` varchar(256) NOT NULL,
-                    PRIMARY KEY (`username`)
+                    username varchar(256) NOT NULL,
+                    authToken varchar(256) NOT NULL,
+                    PRIMARY KEY (username)
                 );
                 """;
         String initGamesTable = """
                 CREATE TABLE IF NOT EXISTS games (
-                    'gameID' int NOT NULL AUTO_INCREMENT,
-                    `gameName` varchar(256) NOT NULL,
-                    'whiteUsername' varchar(256) NOT NULL,
-                    `blackUsername` varchar(256) NOT NULL,
-                    `game` longtext NOT NULL,
-                    PRIMARY KEY (`gameID`)
+                    gameID int NOT NULL AUTO_INCREMENT,
+                    gameName varchar(256) NOT NULL,
+                    whiteUsername varchar(256) NOT NULL,
+                    blackUsername varchar(256) NOT NULL,
+                    game longtext NOT NULL,
+                    PRIMARY KEY (gameID)
                 );
                 """;
 
@@ -55,11 +55,13 @@ public class SQLDataAccess implements DataAccess {
         }
     }
 
-    public SQLDataAccess() throws ServiceException {
+    public SQLDataAccess() {
         try {
             initializeDatabase();
         } catch (DataAccessException ex) {
             System.out.println("oopsie");
+        } catch (ServiceException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 

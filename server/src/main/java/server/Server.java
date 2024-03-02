@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import dataAccess.DataAccess;
 import dataAccess.DataAccessException;
 import dataAccess.MemoryDataAccess;
+import dataAccess.SQLDataAccess;
 import service.ApplicationService;
 import service.GameService;
 import service.UserService;
@@ -27,7 +28,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Database and services
-        DataAccess db = new MemoryDataAccess();
+        DataAccess db = new SQLDataAccess();
         UserService userService = new UserService(db);
         GameService gameService = new GameService(db);
         ApplicationService applicationService = new ApplicationService(db);
