@@ -18,28 +18,20 @@ public class GameService extends Service {
         super(db);
     }
 
-    public static class IDGen {
-        private static int latestID = 1;
-
-        public static int newID() {
-            return latestID++;
-        }
-    }
-
     public CreateGameResponse createGame(String authToken, CreateGameRequest createGameRequest) throws ServiceException, DataAccessException {
         verifyAuthToken(authToken);
         verifyRequestFields(createGameRequest);
 
         // Create the game
         GameData newGame = new GameData(
-                IDGen.newID(),
+                null,
                 null,
                 null,
                 createGameRequest.gameName(),
                 new ChessGame()
         );
         // Insert into database
-        db.insertGame(newGame);
+        newGame = db.insertGame(newGame);
 
         return new CreateGameResponse(newGame.gameID());
     }

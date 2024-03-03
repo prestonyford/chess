@@ -1,8 +1,10 @@
 package dataAccess;
 
+import chess.ChessGame;
 import chess.dataModel.AuthData;
 import chess.dataModel.GameData;
 import chess.dataModel.UserData;
+import com.google.gson.Gson;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -33,8 +35,8 @@ public class SQLDataAccess implements DataAccess {
                 CREATE TABLE IF NOT EXISTS games (
                     gameID int NOT NULL AUTO_INCREMENT,
                     gameName varchar(256) NOT NULL,
-                    whiteUsername varchar(256) NOT NULL,
-                    blackUsername varchar(256) NOT NULL,
+                    whiteUsername varchar(256),
+                    blackUsername varchar(256),
                     game longtext NOT NULL,
                     PRIMARY KEY (gameID)
                 );
@@ -131,9 +133,17 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public void insertGame(GameData gameData) throws DataAccessException {
-        var statement = "INSERT INTO games (username, authToken) VALUES (?, ?)";
-        // executeUpdate(statement, authData.username(), authData.authToken());
+    public GameData insertGame(GameData gameData) throws DataAccessException {
+        var statement = "INSERT INTO games (gameName, whiteUsername, blackUsername, game) VALUES (?, ?, ?, ?)";
+        int id = executeUpdate(statement, gameData.gameName(), gameData.whiteUsername(), gameData.blackUsername(), gameData.game());
+
+        return new GameData(
+                id,
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                gameData.gameName(),
+                gameData.game()
+        );
     }
 
     @Override
@@ -161,7 +171,7 @@ public class SQLDataAccess implements DataAccess {
                     var param = params[i];
                     if (param instanceof String p) ps.setString(i + 1, p);
                     else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                        // else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
+                    else if (param instanceof ChessGame p) ps.setString(i + 1, new Gson().toJson(p));
                     else if (param == null) ps.setNull(i + 1, NULL);
                 }
                 ps.executeUpdate();

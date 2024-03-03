@@ -1,6 +1,8 @@
 package dataAccess;
 
+import chess.ChessGame;
 import chess.dataModel.AuthData;
+import chess.dataModel.GameData;
 import chess.dataModel.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -177,6 +179,21 @@ public class DataAccessTest {
                 "Navia"
         ));
         assertNotNull(dataAccess.getAuth("token0"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MemoryDataAccess.class, SQLDataAccess.class})
+    public void insertGame(Class<? extends DataAccess> dbClass) throws DataAccessException {
+        DataAccess dataAccess = getDataAccess(dbClass);
+
+        dataAccess.insertGame(new GameData(
+                1,
+                "p1",
+                "p2",
+                "game1",
+                new ChessGame()
+        ));
+        
     }
 
     @ParameterizedTest

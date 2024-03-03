@@ -13,6 +13,14 @@ public class MemoryDataAccess implements DataAccess {
     private final HashSet<AuthData> auths = new HashSet<>();
     private final HashSet<GameData> games = new HashSet<>();
 
+    private static class IDGen {
+        private static int latestID = 1;
+
+        public static int newID() {
+            return latestID++;
+        }
+    }
+
     @Override
     public UserData getUser(String username) {
         for (var user : users) {
@@ -58,8 +66,16 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void insertGame(GameData gameData) {
+    public GameData insertGame(GameData gameData) {
+        gameData = new GameData(
+                IDGen.newID(),
+                null,
+                null,
+                gameData.gameName(),
+                gameData.game()
+        );
         games.add(gameData);
+        return gameData;
     }
 
     @Override
