@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GameServiceTests {
-    private static final DataAccess db = new SQLDataAccess();
+    private static final DataAccess db = new MemoryDataAccess();
     private static final UserService userService = new UserService(db);
     private static final GameService gameService = new GameService(db);
     private static RegisterResponse registerResponse;

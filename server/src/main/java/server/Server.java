@@ -22,94 +22,98 @@ import spark.*;
 import java.util.Map;
 
 public class Server {
-
     public int run(int desiredPort) {
-        Spark.port(desiredPort);
-        Spark.staticFiles.location("web");
+        try {
+            Spark.port(desiredPort);
+            Spark.staticFiles.location("web");
 
-        // Database and services
-        DataAccess db = new SQLDataAccess();
-        UserService userService = new UserService(db);
-        GameService gameService = new GameService(db);
-        ApplicationService applicationService = new ApplicationService(db);
+            // Database and services
+            DataAccess db = new SQLDataAccess();
+            UserService userService = new UserService(db);
+            GameService gameService = new GameService(db);
+            ApplicationService applicationService = new ApplicationService(db);
 
-        // Handle all endpoint ServiceExceptions
-        Spark.exception(ServiceException.class, (ex, req, res) -> {
-            String body = new Gson().toJson(Map.of("message", ex.getMessage()));
-            res.type("application/json");
-            res.body(body);
-            res.status(ex.getCode());
-        });
-        // Handle all endpoint DataAccess exceptions
-        Spark.exception(DataAccessException.class, (ex, req, res) -> {
-            res.status(500);
-            res.body(ex.getMessage());
-        });
+            // Handle all endpoint ServiceExceptions
+            Spark.exception(ServiceException.class, (ex, req, res) -> {
+                String body = new Gson().toJson(Map.of("message", ex.getMessage()));
+                res.type("application/json");
+                res.body(body);
+                res.status(ex.getCode());
+            });
+            // Handle all endpoint DataAccess exceptions
+            Spark.exception(DataAccessException.class, (ex, req, res) -> {
+                res.status(500);
+                res.body(ex.getMessage());
+            });
 
-        // Handle endpoints
-        Spark.delete("/db", (req, res) -> {
-            applicationService.bigRedButton();
-            res.status(200);
-            res.body("");
-            return "";
-        });
+            // Handle endpoints
+            Spark.delete("/db", (req, res) -> {
+                applicationService.bigRedButton();
+                res.status(200);
+                res.body("");
+                return "";
+            });
 
-        Spark.post("/user", (req, res) -> {
-            RegisterRequest registerRequest = new Gson().fromJson(req.body(), RegisterRequest.class);
-            RegisterResponse registerResponse = userService.register(registerRequest);
-            res.status(200);
-            res.type("application/json");
-            String body = new Gson().toJson(registerResponse);
-            res.body(body);
-            return body;
-        });
+            Spark.post("/user", (req, res) -> {
+                RegisterRequest registerRequest = new Gson().fromJson(req.body(), RegisterRequest.class);
+                RegisterResponse registerResponse = userService.register(registerRequest);
+                res.status(200);
+                res.type("application/json");
+                String body = new Gson().toJson(registerResponse);
+                res.body(body);
+                return body;
+            });
 
-        Spark.post("/session", (req, res) -> {
-            LoginRequest loginRequest = new Gson().fromJson(req.body(), LoginRequest.class);
-            LoginResponse loginResponse = userService.login(loginRequest);
-            res.status(200);
-            res.type("application/json");
-            String body = new Gson().toJson(loginResponse);
-            res.body(body);
-            return body;
-        });
+            Spark.post("/session", (req, res) -> {
+                LoginRequest loginRequest = new Gson().fromJson(req.body(), LoginRequest.class);
+                LoginResponse loginResponse = userService.login(loginRequest);
+                res.status(200);
+                res.type("application/json");
+                String body = new Gson().toJson(loginResponse);
+                res.body(body);
+                return body;
+            });
 
-        Spark.delete("/session", (req, res) -> {
-            userService.logout(req.headers("Authorization"));
-            res.status(200);
-            res.body("");
-            return "";
-        });
+            Spark.delete("/session", (req, res) -> {
+                userService.logout(req.headers("Authorization"));
+                res.status(200);
+                res.body("");
+                return "";
+            });
 
-        Spark.post("/game", (req, res) -> {
-            CreateGameRequest createGameRequest = new Gson().fromJson(req.body(), CreateGameRequest.class);
-            CreateGameResponse createGameResponse = gameService.createGame(req.headers("Authorization"), createGameRequest);
-            res.status(200);
-            res.type("application/json");
-            String body = new Gson().toJson(createGameResponse);
-            res.body(body);
-            return body;
-        });
+            Spark.post("/game", (req, res) -> {
+                CreateGameRequest createGameRequest = new Gson().fromJson(req.body(), CreateGameRequest.class);
+                CreateGameResponse createGameResponse = gameService.createGame(req.headers("Authorization"), createGameRequest);
+                res.status(200);
+                res.type("application/json");
+                String body = new Gson().toJson(createGameResponse);
+                res.body(body);
+                return body;
+            });
 
-        Spark.put("/game", (req, res) -> {
-            JoinGameRequest joinGameRequest = new Gson().fromJson(req.body(), JoinGameRequest.class);
-            gameService.joinGame(req.headers("Authorization"), joinGameRequest);
-            res.status(200);
-            res.body("");
-            return "";
-        });
+            Spark.put("/game", (req, res) -> {
+                JoinGameRequest joinGameRequest = new Gson().fromJson(req.body(), JoinGameRequest.class);
+                gameService.joinGame(req.headers("Authorization"), joinGameRequest);
+                res.status(200);
+                res.body("");
+                return "";
+            });
 
-        Spark.get("/game", (req, res) -> {
-            ListGamesResponse listGamesResponse = gameService.listGames(req.headers("Authorization"));
-            res.status(200);
-            res.type("application/json");
-            String body = new Gson().toJson(listGamesResponse);
-            res.body(body);
-            return body;
-        });
+            Spark.get("/game", (req, res) -> {
+                ListGamesResponse listGamesResponse = gameService.listGames(req.headers("Authorization"));
+                res.status(200);
+                res.type("application/json");
+                String body = new Gson().toJson(listGamesResponse);
+                res.body(body);
+                return body;
+            });
 
-        Spark.awaitInitialization();
-        return Spark.port();
+            Spark.awaitInitialization();
+            return Spark.port();
+        } catch (DataAccessException ex) {
+            System.out.println("Could not start server: " + ex.getMessage());
+        }
+        return 0;
     }
 
     public void stop() {

@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ApplicationServiceTests {
-    private static final DataAccess db = new SQLDataAccess();
+    private static final DataAccess db = new MemoryDataAccess();
     private static final UserService userService = new UserService(db);
     private static final GameService gameService = new GameService(db);
     private static final ApplicationService applicationService = new ApplicationService(db);

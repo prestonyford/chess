@@ -24,7 +24,10 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void createUser(UserData userData) {
+    public void createUser(UserData userData) throws DataAccessException {
+        if (users.contains(userData)) {
+            throw new DataAccessException("Existing user");
+        }
         users.add(userData);
     }
 

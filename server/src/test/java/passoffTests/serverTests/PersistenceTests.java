@@ -15,7 +15,6 @@ import java.util.List;
 
 
 public class PersistenceTests {
-
     private static TestServerFacade serverFacade;
     private static Server server;
 

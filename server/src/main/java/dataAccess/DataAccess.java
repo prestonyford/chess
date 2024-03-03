@@ -3,6 +3,7 @@ package dataAccess;
 import chess.dataModel.AuthData;
 import chess.dataModel.GameData;
 import chess.dataModel.UserData;
+import service.exceptions.ServiceException;
 
 import java.util.Collection;
 

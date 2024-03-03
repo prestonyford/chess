@@ -3,10 +3,8 @@ package dataAccess;
 import chess.dataModel.AuthData;
 import chess.dataModel.GameData;
 import chess.dataModel.UserData;
-import service.exceptions.ServiceException;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 
@@ -15,7 +13,7 @@ import static java.sql.Types.NULL;
 
 public class SQLDataAccess implements DataAccess {
 
-    private void initializeDatabase() throws DataAccessException, ServiceException {
+    private void initializeDatabase() throws DataAccessException {
         String initUsersTable = """
                 CREATE TABLE IF NOT EXISTS users (
                     username varchar(256) NOT NULL,
@@ -28,7 +26,7 @@ public class SQLDataAccess implements DataAccess {
                 CREATE TABLE IF NOT EXISTS auths (
                     username varchar(256) NOT NULL,
                     authToken varchar(256) NOT NULL,
-                    PRIMARY KEY (username)
+                    PRIMARY KEY (authToken)
                 );
                 """;
         String initGamesTable = """
@@ -56,16 +54,12 @@ public class SQLDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException ex) {
-            throw new ServiceException(500, String.format("Unable to configure database: %s", ex.getMessage()));
+            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }
 
-    public SQLDataAccess() {
-        try {
-            initializeDatabase();
-        } catch (DataAccessException | ServiceException ex) {
-            System.out.println(ex.getMessage());
-        }
+    public SQLDataAccess() throws DataAccessException {
+        initializeDatabase();
     }
 
     @Override
@@ -98,28 +92,48 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public void insertAuth(AuthData authData) {
+    public void insertAuth(AuthData authData) throws DataAccessException {
+        var statement = "INSERT INTO auths (username, authToken) VALUES (?, ?)";
+        executeUpdate(statement, authData.username(), authData.authToken());
+    }
+
+    @Override
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT username, authToken FROM auths WHERE authToken=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new AuthData(
+                                rs.getString("authToken"),
+                                rs.getString("username")
+                        );
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteAuth(AuthData authData) throws DataAccessException {
+        var statement = "DELETE FROM auths WHERE authToken=?";
+        executeUpdate(statement, authData.authToken());
+    }
+
+    @Override
+    public Collection<GameData> listGames() throws DataAccessException {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public AuthData getAuth(String authToken) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public void deleteAuth(AuthData authData) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public Collection<GameData> listGames() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public void insertGame(GameData gameData) {
-        throw new RuntimeException("Not implemented");
+    public void insertGame(GameData gameData) throws DataAccessException {
+        var statement = "INSERT INTO games (username, authToken) VALUES (?, ?)";
+        // executeUpdate(statement, authData.username(), authData.authToken());
     }
 
     @Override
@@ -128,7 +142,7 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public void updateGame(int gameID, GameData gameData) {
+    public void updateGame(int gameID, GameData gameData) throws DataAccessException {
         throw new RuntimeException("Not implemented");
     }
 
