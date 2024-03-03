@@ -186,14 +186,44 @@ public class DataAccessTest {
     public void insertGame(Class<? extends DataAccess> dbClass) throws DataAccessException {
         DataAccess dataAccess = getDataAccess(dbClass);
 
-        dataAccess.insertGame(new GameData(
-                1,
+        var game = dataAccess.insertGame(new GameData(
+                null,
                 "p1",
                 "p2",
                 "game1",
                 new ChessGame()
         ));
-        
+        assertNotNull(game.gameID(), "gameID was still null after inserting to the database when it shouldn't have been");
+        assertEquals(game, dataAccess.getGame(game.gameID()), "could not find game with gameID, or one was found but was not equal");
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MemoryDataAccess.class, SQLDataAccess.class})
+    public void badInsertGame(Class<? extends DataAccess> dbClass) throws DataAccessException {
+        DataAccess dataAccess = getDataAccess(dbClass);
+
+        var game1 = dataAccess.insertGame(new GameData(
+                null,
+                "p1",
+                "p2",
+                "game1",
+                new ChessGame()
+        ));
+        var game2 = dataAccess.insertGame(new GameData(
+                game1.gameID(),
+                "p1",
+                "p2",
+                "game2",
+                new ChessGame()
+        ));
+        assertEquals(new GameData(
+                game1.gameID(),
+                "p1",
+                "p2",
+                "game1",
+                new ChessGame()
+        ), game1);
+        assertNotEquals(game1.gameID(), game2.gameID());
     }
 
     @ParameterizedTest

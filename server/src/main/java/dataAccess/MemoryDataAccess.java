@@ -69,8 +69,8 @@ public class MemoryDataAccess implements DataAccess {
     public GameData insertGame(GameData gameData) {
         gameData = new GameData(
                 IDGen.newID(),
-                null,
-                null,
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
                 gameData.gameName(),
                 gameData.game()
         );
