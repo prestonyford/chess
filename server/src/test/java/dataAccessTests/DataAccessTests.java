@@ -1,3 +1,5 @@
+package dataAccessTests;
+
 import chess.ChessGame;
 import chess.dataModel.AuthData;
 import chess.dataModel.GameData;
