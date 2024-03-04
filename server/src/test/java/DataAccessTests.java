@@ -1,21 +1,20 @@
-package dataAccess;
-
 import chess.ChessGame;
 import chess.dataModel.AuthData;
 import chess.dataModel.GameData;
 import chess.dataModel.UserData;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import dataAccess.DataAccess;
+import dataAccess.DataAccessException;
+import dataAccess.MemoryDataAccess;
+import dataAccess.SQLDataAccess;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import service.exceptions.ServiceException;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DataAccessTest {
+public class DataAccessTests {
     private DataAccess getDataAccess(Class<? extends DataAccess> databaseClass) throws DataAccessException {
         DataAccess db;
         if (databaseClass.equals(SQLDataAccess.class)) {
@@ -356,6 +355,42 @@ public class DataAccessTest {
                 ),
                 dataAccess.getGame(game.gameID()),
                 "Game was not updated correctly"
+        );
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MemoryDataAccess.class, SQLDataAccess.class})
+    public void badUpdateGame(Class<? extends DataAccess> dbClass) throws DataAccessException {
+        DataAccess dataAccess = getDataAccess(dbClass);
+
+        var game = dataAccess.insertGame(new GameData(
+                null,
+                null,
+                null,
+                "game1",
+                new ChessGame()
+        ));
+
+        dataAccess.updateGame(
+                -1,
+                new GameData(
+                        null,
+                        "player1",
+                        null,
+                        "game1",
+                        new ChessGame()
+                )
+        );
+
+        assertEquals(
+                new GameData(
+                        game.gameID(),
+                        null,
+                        null,
+                        "game1",
+                        new ChessGame()
+                ),
+                game
         );
     }
 
