@@ -6,9 +6,12 @@ import chess.dataModel.GameData;
 import chess.dataModel.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import service.exceptions.ServiceException;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -183,6 +186,66 @@ public class DataAccessTest {
 
     @ParameterizedTest
     @ValueSource(classes = {MemoryDataAccess.class, SQLDataAccess.class})
+    public void listGames(Class<? extends DataAccess> dbClass) throws DataAccessException {
+        DataAccess dataAccess = getDataAccess(dbClass);
+        var game1 = dataAccess.insertGame(new GameData(
+                null,
+                "p1",
+                "p2",
+                "game1",
+                new ChessGame()
+        ));
+        var game2 = dataAccess.insertGame(new GameData(
+                null,
+                "p1",
+                "p2",
+                "game2",
+                new ChessGame()
+        ));
+        var game3 = dataAccess.insertGame(new GameData(
+                null,
+                "p1",
+                "p2",
+                "game3",
+                new ChessGame()
+        ));
+
+        dataAccess.insertGame(game1);
+        dataAccess.insertGame(game2);
+        dataAccess.insertGame(game3);
+
+        var games = dataAccess.listGames();
+        assertTrue(games.containsAll(List.of(game1, game2, game3)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MemoryDataAccess.class, SQLDataAccess.class})
+    public void badListGames(Class<? extends DataAccess> dbClass) throws DataAccessException {
+        DataAccess dataAccess = getDataAccess(dbClass);
+        var game1 = dataAccess.insertGame(new GameData(
+                null,
+                "p1",
+                "p2",
+                "sameName",
+                new ChessGame()
+        ));
+        var game2 = dataAccess.insertGame(new GameData(
+                null,
+                "p1",
+                "p2",
+                "sameName",
+                new ChessGame()
+        ));
+
+        dataAccess.insertGame(game1);
+        dataAccess.insertGame(game2);
+
+        var games = dataAccess.listGames();
+        assertTrue(games.containsAll(List.of(game1, game2)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MemoryDataAccess.class, SQLDataAccess.class})
     public void insertGame(Class<? extends DataAccess> dbClass) throws DataAccessException {
         DataAccess dataAccess = getDataAccess(dbClass);
 
@@ -199,6 +262,7 @@ public class DataAccessTest {
 
     @ParameterizedTest
     @ValueSource(classes = {MemoryDataAccess.class, SQLDataAccess.class})
+    @DisplayName("Attempting to add a game with existing ID")
     public void badInsertGame(Class<? extends DataAccess> dbClass) throws DataAccessException {
         DataAccess dataAccess = getDataAccess(dbClass);
 
@@ -224,6 +288,75 @@ public class DataAccessTest {
                 new ChessGame()
         ), game1);
         assertNotEquals(game1.gameID(), game2.gameID());
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MemoryDataAccess.class, SQLDataAccess.class})
+    public void getGame(Class<? extends DataAccess> dbClass) throws DataAccessException {
+        DataAccess dataAccess = getDataAccess(dbClass);
+
+        var game = dataAccess.insertGame(new GameData(
+                null,
+                "pl1",
+                "pl2",
+                "game1",
+                new ChessGame()
+        ));
+        assertNotNull(game.gameID());
+        assertEquals(game, dataAccess.getGame(game.gameID()));
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MemoryDataAccess.class, SQLDataAccess.class})
+    public void badGetGame(Class<? extends DataAccess> dbClass) throws DataAccessException {
+        DataAccess dataAccess = getDataAccess(dbClass);
+
+        var game = dataAccess.insertGame(new GameData(
+                null,
+                "pl1",
+                "pl2",
+                "game1",
+                new ChessGame()
+        ));
+        assertNotNull(game.gameID());
+        assertNull(dataAccess.getGame(0));
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MemoryDataAccess.class, SQLDataAccess.class})
+    public void updateGame(Class<? extends DataAccess> dbClass) throws DataAccessException {
+        DataAccess dataAccess = getDataAccess(dbClass);
+
+        var game = dataAccess.insertGame(new GameData(
+                null,
+                null,
+                null,
+                "game1",
+                new ChessGame()
+        ));
+
+        dataAccess.updateGame(
+                game.gameID(),
+                new GameData(
+                        null,
+                        "player1",
+                        null,
+                        "game1",
+                        new ChessGame()
+                )
+        );
+
+        assertEquals(
+                new GameData(
+                        game.gameID(),
+                        "player1",
+                        null,
+                        "game1",
+                        new ChessGame()
+                ),
+                dataAccess.getGame(game.gameID()),
+                "Game was not updated correctly"
+        );
     }
 
     @ParameterizedTest

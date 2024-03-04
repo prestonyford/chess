@@ -96,7 +96,13 @@ public class MemoryDataAccess implements DataAccess {
                 break;
             }
         }
-        games.add(gameData);
+        games.add(new GameData(
+                gameID,
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                gameData.gameName(),
+                gameData.game()
+        ));
     }
 
     @Override

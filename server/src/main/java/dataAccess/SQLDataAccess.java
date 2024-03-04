@@ -69,7 +69,7 @@ public class SQLDataAccess implements DataAccess {
     @Override
     public UserData getUser(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT username, password, email FROM users WHERE username=?";
+            String statement = "SELECT username, password, email FROM users WHERE username=?;";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
                 try (var rs = ps.executeQuery()) {
@@ -91,20 +91,20 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+        var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?);";
         executeUpdate(statement, userData.username(), userData.password(), userData.email());
     }
 
     @Override
     public void insertAuth(AuthData authData) throws DataAccessException {
-        var statement = "INSERT INTO auths (username, authToken) VALUES (?, ?)";
+        var statement = "INSERT INTO auths (username, authToken) VALUES (?, ?);";
         executeUpdate(statement, authData.username(), authData.authToken());
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT username, authToken FROM auths WHERE authToken=?";
+            String statement = "SELECT username, authToken FROM auths WHERE authToken=?;";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, authToken);
                 try (var rs = ps.executeQuery()) {
@@ -125,15 +125,15 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public void deleteAuth(AuthData authData) throws DataAccessException {
-        var statement = "DELETE FROM auths WHERE authToken=?";
+        var statement = "DELETE FROM auths WHERE authToken=?;";
         executeUpdate(statement, authData.authToken());
     }
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
-        ArrayList<GameData> games = new ArrayList<>();
+        HashSet<GameData> games = new HashSet<>();
         try (var conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT * FROM games";
+            String statement = "SELECT * FROM games;";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 try (var rs = ps.executeQuery()) {
                     while (rs.next()) {
@@ -155,7 +155,7 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public GameData insertGame(GameData gameData) throws DataAccessException {
-        var statement = "INSERT INTO games (gameName, whiteUsername, blackUsername, game) VALUES (?, ?, ?, ?)";
+        var statement = "INSERT INTO games (gameName, whiteUsername, blackUsername, game) VALUES (?, ?, ?, ?);";
         int id = executeUpdate(statement, gameData.gameName(), gameData.whiteUsername(), gameData.blackUsername(), gameData.game());
 
         return new GameData(
@@ -170,7 +170,7 @@ public class SQLDataAccess implements DataAccess {
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT gameID, gameName, whiteUsername, blackUsername, game FROM games WHERE gameID=?";
+            String statement = "SELECT gameID, gameName, whiteUsername, blackUsername, game FROM games WHERE gameID=?;";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
@@ -194,7 +194,15 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public void updateGame(int gameID, GameData gameData) throws DataAccessException {
-        throw new RuntimeException("Not implemented");
+        var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?;";
+        executeUpdate(
+                statement,
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                gameData.gameName(),
+                new Gson().toJson(gameData.game()),
+                gameID
+        );
     }
 
     @Override
