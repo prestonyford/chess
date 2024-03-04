@@ -44,8 +44,11 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void insertAuth(AuthData authData) {
+    public void insertAuth(AuthData authData) throws DataAccessException {
         // Add new auth
+        if (authData.authToken() == null) {
+            throw new DataAccessException("Null authToken");
+        }
         auths.add(authData);
     }
 
