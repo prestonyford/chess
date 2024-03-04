@@ -13,6 +13,10 @@ public class MemoryDataAccess implements DataAccess {
     private final HashSet<AuthData> auths = new HashSet<>();
     private final HashSet<GameData> games = new HashSet<>();
 
+    public MemoryDataAccess() throws DataAccessException {
+
+    }
+
     private static class IDGen {
         private static int latestID = 1;
 

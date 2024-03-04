@@ -3,6 +3,7 @@ import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import dataAccess.DataAccess;
+import dataAccess.DataAccessException;
 import dataAccess.MemoryDataAccess;
 import dataAccess.SQLDataAccess;
 import org.junit.jupiter.api.*;
@@ -16,7 +17,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserServiceTests {
-    private static final DataAccess db = new MemoryDataAccess();
+    private static final DataAccess db;
+
+    static {
+        try {
+            db = new MemoryDataAccess();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static final UserService userService = new UserService(db);
     private static final GameService gameService = new GameService(db);
 
