@@ -8,6 +8,7 @@ import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import dataAccess.DataAccess;
 import dataAccess.DataAccessException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import service.exceptions.ServiceException;
 
 import java.security.SecureRandom;
@@ -37,7 +38,11 @@ public class UserService extends Service {
             throw new ServiceException(403, "Error: already taken");
         }
 
-        db.createUser(new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email()));
+        // Hash password
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        var hashPass = encoder.encode(registerRequest.password());
+
+        db.createUser(new UserData(registerRequest.username(), hashPass, registerRequest.email()));
         var authData = new AuthData(AuthTokenGen.createAuthToken(), registerRequest.username());
         db.insertAuth(authData);
         return new RegisterResponse(authData.username(), authData.authToken());
@@ -45,7 +50,14 @@ public class UserService extends Service {
 
     public LoginResponse login(LoginRequest loginRequest) throws ServiceException, DataAccessException {
         UserData user = db.getUser(loginRequest.username());
-        if (user == null || !Objects.equals(user.password(), loginRequest.password())) {
+        if (user == null) {
+            throw new ServiceException(401, "Error: unauthorized");
+        }
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        var hashPass = user.password();
+
+        if (!encoder.matches(loginRequest.password(), hashPass)) {
             throw new ServiceException(401, "Error: unauthorized");
         }
         // Create new auth
