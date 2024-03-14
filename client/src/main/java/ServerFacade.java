@@ -2,6 +2,7 @@ import java.net.*;
 import java.io.*;
 
 import com.google.gson.Gson;
+import exception.ResponseException;
 
 public class ServerFacade {
     URL url;
@@ -10,7 +11,7 @@ public class ServerFacade {
         this.url = new URI(url).toURL();
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
@@ -21,7 +22,7 @@ public class ServerFacade {
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
         } catch (Exception ex) {
-            // throw new ResponseException(500, ex.getMessage());
+            throw new ResponseException(500, ex.getMessage());
         }
     }
 

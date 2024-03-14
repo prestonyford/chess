@@ -34,7 +34,10 @@ public class ChessClient {
         }
     }
 
-    public String register(String[] params) {
+    public String register(String[] params) throws ResponseException {
+        if (params.length != 3) {
+            throw new ResponseException(400, "Expected: <USERNAME> <PASSWORD> <EMAIL>");
+        }
         return "";
     }
 
