@@ -41,11 +41,17 @@ public class ChessClient {
         return "";
     }
 
-    public String login(String[] params) {
+    public String login(String[] params) throws ResponseException {
+        if (params.length != 2) {
+            throw new ResponseException(400, "Expected: <USERNAME> <PASSWORD>");
+        }
         return "";
     }
 
-    public String create(String[] params) {
+    public String create(String[] params) throws ResponseException {
+        if (params.length != 1) {
+            throw new ResponseException(400, "Expected: <NAME>");
+        }
         return "";
     }
 
@@ -53,11 +59,17 @@ public class ChessClient {
         return "";
     }
 
-    public String join(String[] params) {
+    public String join(String[] params) throws ResponseException {
+        if (params.length != 1) {
+            throw new ResponseException(400, "Expected: <ID>");
+        }
         return "";
     }
 
-    public String observe(String[] params) {
+    public String observe(String[] params) throws ResponseException {
+        if (params.length != 1) {
+            throw new ResponseException(400, "Expected: <ID>");
+        }
         return "";
     }
 
@@ -71,8 +83,7 @@ public class ChessClient {
                     register <USERNAME> <PASSWORD> <EMAIL> - to create an account
                     login <USERNAME> <PASSWORD> - to log in and access games
                     quit - exit the application
-                    help - what you're looking at now
-                    """;
+                    help - what you're looking at now""";
         }
         return """
                 create <NAME> - create a game with the given name
@@ -81,7 +92,6 @@ public class ChessClient {
                 observe <ID> - spectate a game
                 logout - logout
                 quit - quit
-                help - what you're looking at now
-                """;
+                help - what you're looking at now""";
     }
 }
