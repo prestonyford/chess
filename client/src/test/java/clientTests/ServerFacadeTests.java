@@ -1,10 +1,13 @@
 package clientTests;
 
+import chess.ChessGame;
+import chess.dataModel.GameData;
 import chess.dataModel.request.CreateGameRequest;
 import chess.dataModel.request.JoinGameRequest;
 import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.CreateGameResponse;
+import chess.dataModel.response.ListGamesResponse;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import client.ServerFacade;
@@ -215,6 +218,64 @@ public class ServerFacadeTests {
                 ResponseException.class,
                 () -> serverFacade.joinGame(new JoinGameRequest("WHITE", response.gameID() + 1)),
                 "Server allowed joining a nonexistent game when it shouldn't have"
+        );
+    }
+
+    @Test
+    public void listGames() throws ResponseException {
+        serverFacade.register(new RegisterRequest(
+                "Ponyo",
+                "OnACliff",
+                "By@The.Sea"
+        ));
+        // Assert empty list
+        Assertions.assertArrayEquals(new GameData[]{}, serverFacade.listGames().games());
+
+        // Add games and assert they were added to list
+        CreateGameResponse game1Response = serverFacade.createGame(new CreateGameRequest(
+                "New Game"
+        ));
+        CreateGameResponse game2Response = serverFacade.createGame(new CreateGameRequest(
+                "New Game2"
+        ));
+        serverFacade.joinGame(new JoinGameRequest("WHITE", game1Response.gameID()));
+        serverFacade.joinGame(new JoinGameRequest("BLACK", game2Response.gameID()));
+        ListGamesResponse listGamesResponse = serverFacade.listGames();
+        Assertions.assertArrayEquals(new GameData[]{
+                        new GameData(
+                                game1Response.gameID(),
+                                "Ponyo",
+                                null,
+                                "New Game",
+                                new ChessGame()
+                        ),
+                        new GameData(
+                                game2Response.gameID(),
+                                null,
+                                "Ponyo",
+                                "New Game2",
+                                new ChessGame()
+                        )
+                },
+                listGamesResponse.games());
+    }
+
+    @Test
+    public void badListGamesNoAuth() throws ResponseException {
+        serverFacade.register(new RegisterRequest(
+                "Ponyo",
+                "OnACliff",
+                "By@The.Sea"
+        ));
+        CreateGameResponse game1Response = serverFacade.createGame(new CreateGameRequest(
+                "New Game"
+        ));
+        serverFacade.joinGame(new JoinGameRequest("WHITE", game1Response.gameID()));
+        serverFacade.logout();
+        Assertions.assertThrows(
+                ResponseException.class,
+                () -> serverFacade.listGames(),
+                "Server listed games without Authorization when it shouldn't have"
         );
     }
 }

@@ -15,8 +15,8 @@ public record GameData(
                 "ID: %d\nName: %s\nWhite: %s\nBlack: %s",
                 gameID,
                 gameName,
-                whiteUsername,
-                blackUsername
+                (whiteUsername == null) ? "<empty>" : whiteUsername,
+                (whiteUsername == null) ? "<empty>" : blackUsername
         );
     }
 }
