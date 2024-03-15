@@ -1,8 +1,10 @@
 package clientTests;
 
 import chess.dataModel.request.CreateGameRequest;
+import chess.dataModel.request.JoinGameRequest;
 import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
+import chess.dataModel.response.CreateGameResponse;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import client.ServerFacade;
@@ -38,7 +40,7 @@ public class ServerFacadeTests {
         RegisterResponse response = serverFacade.register(new RegisterRequest(
                 "Ponyo",
                 "OnACliff",
-                "ByTheSea"
+                "By@The.Sea"
         ));
         Assertions.assertEquals("Ponyo", response.username());
     }
@@ -48,7 +50,7 @@ public class ServerFacadeTests {
         RegisterResponse response = serverFacade.register(new RegisterRequest(
                 "Ponyo",
                 "OnACliff",
-                "ByTheSea"
+                "By@The.Sea"
         ));
         Assertions.assertEquals("Ponyo", response.username());
         Assertions.assertThrows(
@@ -56,7 +58,7 @@ public class ServerFacadeTests {
                 () -> serverFacade.register(new RegisterRequest(
                         "Ponyo",
                         "OnACliff",
-                        "ByTheSea"
+                        "By@The.Sea"
                 )),
                 "Server allowed duplicate username when it shouldn't have"
         );
@@ -67,7 +69,7 @@ public class ServerFacadeTests {
         serverFacade.register(new RegisterRequest(
                 "Ponyo",
                 "OnACliff",
-                "ByTheSea"
+                "By@The.Sea"
         ));
         LoginResponse response = serverFacade.login(new LoginRequest(
                 "Ponyo",
@@ -93,7 +95,7 @@ public class ServerFacadeTests {
         serverFacade.register(new RegisterRequest(
                 "Ponyo",
                 "OnACliff",
-                "ByTheSea"
+                "By@The.Sea"
         ));
         Assertions.assertThrows(
                 ResponseException.class,
@@ -110,7 +112,7 @@ public class ServerFacadeTests {
         serverFacade.register(new RegisterRequest(
                 "Ponyo",
                 "OnACliff",
-                "ByTheSea"
+                "By@The.Sea"
         ));
         serverFacade.login(new LoginRequest(
                 "Ponyo",
@@ -124,7 +126,7 @@ public class ServerFacadeTests {
         serverFacade.register(new RegisterRequest(
                 "Ponyo",
                 "OnACliff",
-                "ByTheSea"
+                "By@The.Sea"
         ));
         serverFacade.logout();
         serverFacade.login(new LoginRequest(
@@ -148,7 +150,7 @@ public class ServerFacadeTests {
         serverFacade.register(new RegisterRequest(
                 "Ponyo",
                 "OnACliff",
-                "ByTheSea"
+                "By@The.Sea"
         ));
         serverFacade.createGame(new CreateGameRequest("New Game"));
     }
@@ -158,13 +160,61 @@ public class ServerFacadeTests {
         serverFacade.register(new RegisterRequest(
                 "Ponyo",
                 "OnACliff",
-                "ByTheSea"
+                "By@The.Sea"
         ));
         serverFacade.logout();
         Assertions.assertThrows(
                 ResponseException.class,
                 () -> serverFacade.createGame(new CreateGameRequest("New Game")),
                 "Server allowed creation of game without authorization when it shouldn't have"
+        );
+    }
+
+    @Test
+    public void joinGame() throws ResponseException {
+        serverFacade.register(new RegisterRequest(
+                "Ponyo",
+                "OnACliff",
+                "By@The.Sea"
+        ));
+        CreateGameResponse response = serverFacade.createGame(new CreateGameRequest(
+                "New Game"
+        ));
+        serverFacade.joinGame(new JoinGameRequest("WHITE", response.gameID()));
+    }
+
+    @Test
+    public void badJoinGameNoAuth() throws ResponseException {
+        serverFacade.register(new RegisterRequest(
+                "Ponyo",
+                "OnACliff",
+                "By@The.Sea"
+        ));
+        CreateGameResponse response = serverFacade.createGame(new CreateGameRequest(
+                "New Game"
+        ));
+        serverFacade.logout();
+        Assertions.assertThrows(
+                ResponseException.class,
+                () -> serverFacade.joinGame(new JoinGameRequest("WHITE", response.gameID())),
+                "Server allowed joining a game without authorization when it shouldn't have"
+        );
+    }
+
+    @Test
+    public void badJoinGameBadID() throws ResponseException {
+        serverFacade.register(new RegisterRequest(
+                "Ponyo",
+                "OnACliff",
+                "By@The.Sea"
+        ));
+        CreateGameResponse response = serverFacade.createGame(new CreateGameRequest(
+                "New Game"
+        ));
+        Assertions.assertThrows(
+                ResponseException.class,
+                () -> serverFacade.joinGame(new JoinGameRequest("WHITE", response.gameID() + 1)),
+                "Server allowed joining a nonexistent game when it shouldn't have"
         );
     }
 }

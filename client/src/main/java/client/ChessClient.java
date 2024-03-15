@@ -78,15 +78,26 @@ public class ChessClient {
         return String.format("Successfully created game with ID: %d", response.gameID());
     }
 
-    public String list() {
-        return "";
+    public String join(String[] params) throws ResponseException {
+        if (params.length != 2) {
+            throw new ResponseException(400, "Expected: <ID> [WHITE|BLANK|<empty>]");
+        }
+        int gameID;
+        try {
+            gameID = Integer.parseInt(params[0]);
+        } catch (NumberFormatException e) {
+            throw new ResponseException(400, "Expected: <ID> [WHITE|BLANK|<empty>]");
+        }
+        serverFacade.joinGame(new JoinGameRequest(
+                params[1],
+                gameID
+        ));
+        return String.format("Successfully joined game %d", gameID);
     }
 
-    public String join(String[] params) throws ResponseException {
-        if (params.length != 1) {
-            throw new ResponseException(400, "Expected: <ID>");
-        }
-        return "";
+    public String list() throws ResponseException {
+        ListGamesResponse response = serverFacade.listGames();
+        return response.toString();
     }
 
     public String observe(String[] params) throws ResponseException {
@@ -112,5 +123,9 @@ public class ChessClient {
                 logout - logout
                 quit - quit
                 help - what you're looking at now""";
+    }
+
+    public String outputGame() {
+        return "";
     }
 }

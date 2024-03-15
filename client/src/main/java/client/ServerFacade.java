@@ -5,9 +5,11 @@ import java.io.*;
 import java.util.Map;
 
 import chess.dataModel.request.CreateGameRequest;
+import chess.dataModel.request.JoinGameRequest;
 import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.CreateGameResponse;
+import chess.dataModel.response.ListGamesResponse;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import com.google.gson.Gson;
@@ -22,7 +24,7 @@ public class ServerFacade {
     }
 
     public void clearDB() throws ResponseException {
-        makeRequest("DELETE", "/db", "", null);
+        makeRequest("DELETE", "/db", null, null);
     }
 
     public RegisterResponse register(RegisterRequest request) throws ResponseException {
@@ -37,13 +39,21 @@ public class ServerFacade {
         return response;
     }
 
+    public void logout() throws ResponseException {
+        makeRequest("DELETE", "/session", null, null);
+        authToken = null;
+    }
+
     public CreateGameResponse createGame(CreateGameRequest request) throws ResponseException {
         return makeRequest("POST", "/game", request, CreateGameResponse.class);
     }
 
-    public void logout() throws ResponseException {
-        makeRequest("DELETE", "/session", "", null);
-        authToken = null;
+    public void joinGame(JoinGameRequest request) throws ResponseException {
+        makeRequest("PUT", "/game", request, JoinGameRequest.class);
+    }
+
+    public ListGamesResponse listGames() throws ResponseException {
+        return makeRequest("GET", "/game", null, ListGamesResponse.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
