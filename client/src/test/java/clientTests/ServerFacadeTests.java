@@ -1,6 +1,8 @@
 package clientTests;
 
+import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
+import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import client.ServerFacade;
 import client.exception.ResponseException;
@@ -56,6 +58,49 @@ public class ServerFacadeTests {
                         "ByTheSea"
                 )),
                 "Server allowed duplicate username when it shouldn't have"
+        );
+    }
+
+    @Test
+    public void login() throws ResponseException {
+        serverFacade.register(new RegisterRequest(
+                "Ponyo",
+                "OnACliff",
+                "ByTheSea"
+        ));
+        LoginResponse response = serverFacade.login(new LoginRequest(
+                "Ponyo",
+                "OnACliff"
+        ));
+        Assertions.assertEquals("Ponyo", response.username());
+    }
+
+    @Test
+    public void badLoginNoUser() throws ResponseException {
+        Assertions.assertThrows(
+                ResponseException.class,
+                () -> serverFacade.login(new LoginRequest(
+                        "Ponyo",
+                        "OnACliff"
+                )),
+                "Server allowed login to nonexistent user when it shouldn't have"
+        );
+    }
+
+    @Test
+    public void badLoginBadPassword() throws ResponseException {
+        serverFacade.register(new RegisterRequest(
+                "Ponyo",
+                "OnACliff",
+                "ByTheSea"
+        ));
+        Assertions.assertThrows(
+                ResponseException.class,
+                () -> serverFacade.login(new LoginRequest(
+                        "Ponyo",
+                        "NotOnACliff"
+                )),
+                "Server allowed login with bad password it shouldn't have"
         );
     }
 }

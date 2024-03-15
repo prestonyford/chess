@@ -4,7 +4,9 @@ import java.net.*;
 import java.io.*;
 import java.util.Map;
 
+import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
+import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import com.google.gson.Gson;
 import client.exception.ResponseException;
@@ -22,6 +24,10 @@ public class ServerFacade {
 
     public RegisterResponse register(RegisterRequest request) throws ResponseException {
         return makeRequest("POST", "/user", request, RegisterResponse.class);
+    }
+
+    public LoginResponse login(LoginRequest request) throws ResponseException {
+        return makeRequest("POST", "/session", request, LoginResponse.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {

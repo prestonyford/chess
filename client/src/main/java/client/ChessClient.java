@@ -56,7 +56,13 @@ public class ChessClient {
         if (params.length != 2) {
             throw new ResponseException(400, "Expected: <USERNAME> <PASSWORD>");
         }
-        return "";
+        LoginResponse response = serverFacade.login(new LoginRequest(
+                params[0],
+                params[1]
+        ));
+        auth = response.authToken();
+        state = State.LOGGED_IN;
+        return String.format("Successfully logged in as %s", response.username());
     }
 
     public String create(String[] params) throws ResponseException {
