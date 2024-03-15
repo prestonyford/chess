@@ -72,7 +72,10 @@ public class ChessClient {
         if (params.length != 1) {
             throw new ResponseException(400, "Expected: <NAME>");
         }
-        return "";
+        CreateGameResponse response = serverFacade.createGame(new CreateGameRequest(
+                params[0]
+        ));
+        return String.format("Successfully created game with ID: %d", response.gameID());
     }
 
     public String list() {

@@ -1,5 +1,6 @@
 package clientTests;
 
+import chess.dataModel.request.CreateGameRequest;
 import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.LoginResponse;
@@ -139,6 +140,31 @@ public class ServerFacadeTests {
                 ResponseException.class,
                 () -> serverFacade.logout(),
                 "Server allowed logout when it shouldn't have"
+        );
+    }
+
+    @Test
+    public void createGame() throws ResponseException {
+        serverFacade.register(new RegisterRequest(
+                "Ponyo",
+                "OnACliff",
+                "ByTheSea"
+        ));
+        serverFacade.createGame(new CreateGameRequest("New Game"));
+    }
+
+    @Test
+    public void badCreateGameNoAuth() throws ResponseException {
+        serverFacade.register(new RegisterRequest(
+                "Ponyo",
+                "OnACliff",
+                "ByTheSea"
+        ));
+        serverFacade.logout();
+        Assertions.assertThrows(
+                ResponseException.class,
+                () -> serverFacade.createGame(new CreateGameRequest("New Game")),
+                "Server allowed creation of game without authorization when it shouldn't have"
         );
     }
 }

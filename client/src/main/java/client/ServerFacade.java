@@ -4,8 +4,10 @@ import java.net.*;
 import java.io.*;
 import java.util.Map;
 
+import chess.dataModel.request.CreateGameRequest;
 import chess.dataModel.request.LoginRequest;
 import chess.dataModel.request.RegisterRequest;
+import chess.dataModel.response.CreateGameResponse;
 import chess.dataModel.response.LoginResponse;
 import chess.dataModel.response.RegisterResponse;
 import com.google.gson.Gson;
@@ -33,6 +35,10 @@ public class ServerFacade {
         LoginResponse response = makeRequest("POST", "/session", request, LoginResponse.class);
         authToken = response.authToken();
         return response;
+    }
+
+    public CreateGameResponse createGame(CreateGameRequest request) throws ResponseException {
+        return makeRequest("POST", "/game", request, CreateGameResponse.class);
     }
 
     public void logout() throws ResponseException {
