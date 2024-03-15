@@ -106,6 +106,39 @@ public class ServerFacadeTests {
 
     @Test
     public void logout() throws ResponseException {
+        serverFacade.register(new RegisterRequest(
+                "Ponyo",
+                "OnACliff",
+                "ByTheSea"
+        ));
+        serverFacade.login(new LoginRequest(
+                "Ponyo",
+                "OnACliff"
+        ));
         serverFacade.logout();
+    }
+
+    @Test
+    public void logoutAndLogBackIn() throws ResponseException {
+        serverFacade.register(new RegisterRequest(
+                "Ponyo",
+                "OnACliff",
+                "ByTheSea"
+        ));
+        serverFacade.logout();
+        serverFacade.login(new LoginRequest(
+                "Ponyo",
+                "OnACliff"
+        ));
+        serverFacade.logout();
+    }
+
+    @Test
+    public void badLogoutNoAuth() throws ResponseException {
+        Assertions.assertThrows(
+                ResponseException.class,
+                () -> serverFacade.logout(),
+                "Server allowed logout when it shouldn't have"
+        );
     }
 }
