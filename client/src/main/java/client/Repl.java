@@ -1,8 +1,10 @@
+package client;
+
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Scanner;
 
-import static ui.EscapeSequences.*;
+import static client.ui.EscapeSequences.*;
 
 public class Repl {
     private final ChessClient client;

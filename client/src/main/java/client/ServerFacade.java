@@ -1,3 +1,5 @@
+package client;
+
 import java.net.*;
 import java.io.*;
 import java.util.Map;
@@ -5,13 +7,17 @@ import java.util.Map;
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.RegisterResponse;
 import com.google.gson.Gson;
-import exception.ResponseException;
+import client.exception.ResponseException;
 
 public class ServerFacade {
     private final String serverUrl;
 
     public ServerFacade(String url) throws URISyntaxException, MalformedURLException {
         this.serverUrl = url;
+    }
+
+    public void clearDB() throws ResponseException {
+        makeRequest("DELETE", "/db", "", Map.class);
     }
 
     public RegisterResponse register(RegisterRequest request) throws ResponseException {

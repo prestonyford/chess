@@ -141,7 +141,7 @@ public class GameServiceTests {
         assertThrows(
                 ServiceException.class,
                 () -> gameService.listGames(""),
-                "Expected unauthorized exception but didn't get one"
+                "Expected unauthorized client.exception but didn't get one"
         );
     }
 }

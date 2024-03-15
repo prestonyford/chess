@@ -1,7 +1,8 @@
-import chess.ChessGame;
+package client;
+
 import chess.dataModel.request.*;
 import chess.dataModel.response.*;
-import exception.ResponseException;
+import client.exception.ResponseException;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;

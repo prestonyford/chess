@@ -1,4 +1,4 @@
-package exception;
+package client.exception;
 
 public class ResponseException extends Exception {
     private final int code;
