@@ -43,7 +43,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void badRegister() throws ResponseException {
+    public void badRegisterAlreadyExists() throws ResponseException {
         RegisterResponse response = serverFacade.register(new RegisterRequest(
                 "Ponyo",
                 "OnACliff",
@@ -102,5 +102,10 @@ public class ServerFacadeTests {
                 )),
                 "Server allowed login with bad password it shouldn't have"
         );
+    }
+
+    @Test
+    public void logout() throws ResponseException {
+        serverFacade.logout();
     }
 }

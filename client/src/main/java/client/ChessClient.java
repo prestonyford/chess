@@ -11,7 +11,6 @@ import java.util.Arrays;
 public class ChessClient {
     private final ServerFacade serverFacade;
     private State state = State.LOGGED_OUT;
-    private String auth = null;
 
     public ChessClient(String serverUrl) throws MalformedURLException, URISyntaxException {
         serverFacade = new ServerFacade(serverUrl);
@@ -47,7 +46,6 @@ public class ChessClient {
                 params[1],
                 params[2]
         ));
-        auth = response.authToken();
         state = State.LOGGED_IN;
         return String.format("Successfully created user: %s", response.username());
     }
@@ -60,9 +58,14 @@ public class ChessClient {
                 params[0],
                 params[1]
         ));
-        auth = response.authToken();
         state = State.LOGGED_IN;
         return String.format("Successfully logged in as %s", response.username());
+    }
+
+    public String logout() throws ResponseException {
+        serverFacade.logout();
+        state = State.LOGGED_OUT;
+        return "Successfully logged out";
     }
 
     public String create(String[] params) throws ResponseException {
@@ -87,10 +90,6 @@ public class ChessClient {
         if (params.length != 1) {
             throw new ResponseException(400, "Expected: <ID>");
         }
-        return "";
-    }
-
-    public String logout() {
         return "";
     }
 

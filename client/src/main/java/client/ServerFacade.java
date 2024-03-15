@@ -13,21 +13,31 @@ import client.exception.ResponseException;
 
 public class ServerFacade {
     private final String serverUrl;
+    private String authToken;
 
     public ServerFacade(String url) throws URISyntaxException, MalformedURLException {
         this.serverUrl = url;
     }
 
     public void clearDB() throws ResponseException {
-        makeRequest("DELETE", "/db", "", Map.class);
+        makeRequest("DELETE", "/db", "", null);
     }
 
     public RegisterResponse register(RegisterRequest request) throws ResponseException {
-        return makeRequest("POST", "/user", request, RegisterResponse.class);
+        RegisterResponse response = makeRequest("POST", "/user", request, RegisterResponse.class);
+        authToken = response.authToken();
+        return response;
     }
 
     public LoginResponse login(LoginRequest request) throws ResponseException {
-        return makeRequest("POST", "/session", request, LoginResponse.class);
+        LoginResponse response = makeRequest("POST", "/session", request, LoginResponse.class);
+        authToken = response.authToken();
+        return response;
+    }
+
+    public void logout() throws ResponseException {
+        makeRequest("DELETE", "/session", "", null);
+        authToken = null;
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
@@ -36,6 +46,7 @@ public class ServerFacade {
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
+            writeAuthHeader(http);
             writeBody(http, request);
             http.connect();
             throwIfNotSuccessful(http);
@@ -46,7 +57,7 @@ public class ServerFacade {
     }
 
 
-    private static void writeBody(HttpURLConnection http, Object request) throws IOException {
+    private void writeBody(HttpURLConnection http, Object request) throws IOException {
         if (request != null) {
             http.addRequestProperty("Content-Type", "application/json");
             String reqData = new Gson().toJson(request);
@@ -54,6 +65,10 @@ public class ServerFacade {
                 reqBody.write(reqData.getBytes());
             }
         }
+    }
+
+    private void writeAuthHeader(HttpURLConnection http) {
+        http.addRequestProperty("Authorization", this.authToken);
     }
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
