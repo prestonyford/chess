@@ -47,6 +47,7 @@ public class ChessClient {
                 params[2]
         ));
         auth = response.authToken();
+        state = State.LOGGED_IN;
         return String.format("Successfully created user: %s", response.username());
     }
 

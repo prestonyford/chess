@@ -1,5 +1,6 @@
 import java.net.*;
 import java.io.*;
+import java.util.Map;
 
 import chess.dataModel.request.RegisterRequest;
 import chess.dataModel.response.RegisterResponse;
@@ -45,15 +46,26 @@ public class ServerFacade {
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
+        String message = String.format("Failure(%d)", status);
         if (!isSuccessful(status)) {
-            throw new ResponseException(status, "failure: " + status);
+            var body = readBody(http, Map.class);
+            if (body.containsKey("message")) {
+                message = message + ": " + body.get("message");
+            }
+            throw new ResponseException(status, message);
         }
     }
 
     private static <T> T readBody(HttpURLConnection http, Class<T> responseClass) throws IOException {
         T response = null;
-        if (http.getContentLength() < 0) {
-            try (InputStream respBody = http.getInputStream()) {
+        InputStream stream;
+        if (isSuccessful(http.getResponseCode())) {
+            stream = http.getInputStream();
+        } else {
+            stream = http.getErrorStream();
+        }
+        if (http.getContentLength() <= 0) {
+            try (InputStream respBody = stream) {
                 InputStreamReader reader = new InputStreamReader(respBody);
                 if (responseClass != null) {
                     response = new Gson().fromJson(reader, responseClass);
@@ -64,7 +76,7 @@ public class ServerFacade {
     }
 
 
-    private boolean isSuccessful(int status) {
+    private static boolean isSuccessful(int status) {
         return status / 100 == 2;
     }
 }

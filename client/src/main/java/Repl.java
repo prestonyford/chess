@@ -20,14 +20,9 @@ public class Repl {
             printPrompt();
             String line = scanner.nextLine();
 
-            try {
-                result = client.eval(line);
-                System.out.print(SET_TEXT_COLOR_BLUE + result);
-                System.out.print((result.isEmpty()) ? "" : '\n');
-            } catch (Throwable e) {
-                var msg = e.toString();
-                System.out.print(msg);
-            }
+            result = client.eval(line);
+            System.out.print(SET_TEXT_COLOR_BLUE + result);
+            System.out.print((result.isEmpty()) ? "" : '\n');
         }
         System.out.println();
     }
