@@ -1,4 +1,6 @@
 import chess.ChessGame;
+import chess.dataModel.request.*;
+import chess.dataModel.response.*;
 import exception.ResponseException;
 
 import java.net.MalformedURLException;
@@ -8,6 +10,7 @@ import java.util.Arrays;
 public class ChessClient {
     private final ServerFacade serverFacade;
     private State state = State.LOGGED_OUT;
+    private String auth = null;
 
     public ChessClient(String serverUrl) throws MalformedURLException, URISyntaxException {
         serverFacade = new ServerFacade(serverUrl);
@@ -38,7 +41,13 @@ public class ChessClient {
         if (params.length != 3) {
             throw new ResponseException(400, "Expected: <USERNAME> <PASSWORD> <EMAIL>");
         }
-        return "";
+        RegisterResponse response = serverFacade.register(new RegisterRequest(
+                params[0],
+                params[1],
+                params[2]
+        ));
+        auth = response.authToken();
+        return String.format("Successfully created user: %s", response.username());
     }
 
     public String login(String[] params) throws ResponseException {

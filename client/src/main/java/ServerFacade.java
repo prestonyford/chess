@@ -1,19 +1,25 @@
 import java.net.*;
 import java.io.*;
 
+import chess.dataModel.request.RegisterRequest;
+import chess.dataModel.response.RegisterResponse;
 import com.google.gson.Gson;
 import exception.ResponseException;
 
 public class ServerFacade {
-    URL url;
+    private final String serverUrl;
 
     public ServerFacade(String url) throws URISyntaxException, MalformedURLException {
-        this.url = new URI(url).toURL();
+        this.serverUrl = url;
+    }
+
+    public RegisterResponse register(RegisterRequest request) throws ResponseException {
+        return makeRequest("POST", "/user", request, RegisterResponse.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
-            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            HttpURLConnection http = (HttpURLConnection) new URI(serverUrl + path).toURL().openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
