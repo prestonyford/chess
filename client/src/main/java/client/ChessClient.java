@@ -1,5 +1,9 @@
 package client;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import chess.dataModel.request.*;
 import chess.dataModel.response.*;
 import client.exception.ResponseException;
@@ -7,6 +11,8 @@ import client.exception.ResponseException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+
+import static client.ui.EscapeSequences.*;
 
 public class ChessClient {
     private final ServerFacade serverFacade;
@@ -92,7 +98,7 @@ public class ChessClient {
                 params[1],
                 gameID
         ));
-        return String.format("Successfully joined game %d", gameID);
+        return String.format("Successfully joined game %d\n%s", gameID, stringBoard(new ChessBoard()));
     }
 
     public String list() throws ResponseException {
@@ -125,7 +131,65 @@ public class ChessClient {
                 help - what you're looking at now""";
     }
 
-    public String outputGame() {
+    public String stringBoard(ChessBoard board) {
+        StringBuilder sb = new StringBuilder();
+        ChessGame.TeamColor tileColor = ChessGame.TeamColor.WHITE;
+        for (int row = 1; row <= 8; ++row) {
+            tileColor = tileColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+            for (int col = 1; col <= 8; ++col) {
+                tileColor = tileColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+
+                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+                ChessGame.TeamColor teamColor = piece == null ? null : piece.getTeamColor();
+                tileCell(sb, tileColor, teamColor, piece == null ? null : piece.getPieceType());
+            }
+            sb.append(RESET_BG_COLOR + "\n");
+        }
+        return sb.toString();
+    }
+
+    public String stringOppositeBoard() {
         return "";
+    }
+
+    private void coordCell(StringBuilder sb, char c) {
+        sb.append(SET_BG_COLOR_LIGHT_GREY);
+        sb.append(SET_TEXT_COLOR_BLACK);
+        sb.append(c);
+    }
+
+    private void tileCell(StringBuilder sb, ChessGame.TeamColor tileColor, ChessGame.TeamColor teamColor, ChessPiece.PieceType piece) {
+        if (tileColor == ChessGame.TeamColor.WHITE) {
+            sb.append(SET_BG_COLOR_WHITE);
+        } else {
+            sb.append(SET_BG_COLOR_BLACK);
+        }
+        if (teamColor == ChessGame.TeamColor.WHITE) {
+            sb.append(SET_TEXT_COLOR_RED);
+        } else {
+            sb.append(SET_TEXT_COLOR_BLUE);
+        }
+
+        if (piece != null) {
+            switch (piece) {
+                case KING:
+                    sb.append('K');
+                case QUEEN:
+                    sb.append('Q');
+                case KNIGHT:
+                    sb.append('N');
+                case BISHOP:
+                    sb.append('B');
+                case ROOK:
+                    sb.append('R');
+                case PAWN:
+                    sb.append('P');
+                default:
+                    sb.append(' ');
+            }
+        } else {
+            sb.append(' ');
+        }
+
     }
 }
