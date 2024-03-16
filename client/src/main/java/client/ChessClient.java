@@ -134,22 +134,42 @@ public class ChessClient {
     public String stringBoard(ChessBoard board) {
         StringBuilder sb = new StringBuilder();
         ChessGame.TeamColor tileColor = ChessGame.TeamColor.WHITE;
-        for (int row = 1; row <= 8; ++row) {
+        borderCell(sb, ' ');
+        for (char i = 'A'; i < 'A' + 8; ++i) {
+            borderCell(sb, i);
+        }
+        borderCell(sb, ' ');
+        sb.append(RESET_BG_COLOR + '\n');
+        for (int row = 8; row >= 1; --row) {
             tileColor = tileColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+            borderCell(sb, (char) ('1' - 1 + row));
             for (int col = 1; col <= 8; ++col) {
                 tileColor = tileColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
-
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                 ChessGame.TeamColor teamColor = piece == null ? null : piece.getTeamColor();
                 tileCell(sb, tileColor, teamColor, piece == null ? null : piece.getPieceType());
             }
+            borderCell(sb, (char) ('1' - 1 + row));
             sb.append(RESET_BG_COLOR + "\n");
         }
+        borderCell(sb, ' ');
+        for (char i = 'A'; i < 'A' + 8; ++i) {
+            borderCell(sb, i);
+        }
+        borderCell(sb, ' ');
+        sb.append(RESET_BG_COLOR + RESET_TEXT_COLOR);
         return sb.toString();
     }
 
     public String stringOppositeBoard() {
         return "";
+    }
+
+    private void borderCell(StringBuilder sb, char symbol) {
+        sb.append(SET_BG_COLOR_BORDER + SET_TEXT_COLOR_WHITE);
+        sb.append("\u2005\u2005");
+        sb.append(symbol);
+        sb.append("\u2005\u2005");
     }
 
     private void coordCell(StringBuilder sb, char c) {
@@ -160,36 +180,39 @@ public class ChessClient {
 
     private void tileCell(StringBuilder sb, ChessGame.TeamColor tileColor, ChessGame.TeamColor teamColor, ChessPiece.PieceType piece) {
         if (tileColor == ChessGame.TeamColor.WHITE) {
-            sb.append(SET_BG_COLOR_WHITE);
+            sb.append(SET_BG_COLOR_BEIGE);
         } else {
-            sb.append(SET_BG_COLOR_BLACK);
+            sb.append(SET_BG_COLOR_BROWN);
         }
         if (teamColor == ChessGame.TeamColor.WHITE) {
-            sb.append(SET_TEXT_COLOR_RED);
+            sb.append(SET_TEXT_COLOR_WHITE);
         } else {
-            sb.append(SET_TEXT_COLOR_BLUE);
+            sb.append(SET_TEXT_COLOR_BLACK);
         }
 
         if (piece != null) {
             switch (piece) {
                 case KING:
-                    sb.append('K');
+                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? WHITE_KING : BLACK_KING);
+                    break;
                 case QUEEN:
-                    sb.append('Q');
+                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? WHITE_QUEEN : BLACK_QUEEN);
+                    break;
                 case KNIGHT:
-                    sb.append('N');
+                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? WHITE_KNIGHT : BLACK_KNIGHT);
+                    break;
                 case BISHOP:
-                    sb.append('B');
+                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? WHITE_BISHOP : BLACK_BISHOP);
+                    break;
                 case ROOK:
-                    sb.append('R');
+                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? WHITE_ROOK : BLACK_ROOK);
+                    break;
                 case PAWN:
-                    sb.append('P');
-                default:
-                    sb.append(' ');
+                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? WHITE_PAWN : BLACK_PAWN);
+                    break;
             }
         } else {
-            sb.append(' ');
+            sb.append(EMPTY);
         }
-
     }
 }

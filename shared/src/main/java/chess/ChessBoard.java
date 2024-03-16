@@ -13,7 +13,7 @@ public class ChessBoard {
     private ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
-
+        resetBoard();
     }
 
     public ChessBoard(ChessBoard other) {
@@ -52,8 +52,7 @@ public class ChessBoard {
         addPiece(move.getStartPosition(), null);
         if (move.getPromotionPiece() != null) {
             addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
-        }
-        else {
+        } else {
             addPiece(move.getEndPosition(), piece);
         }
     }
@@ -65,12 +64,12 @@ public class ChessBoard {
     public void resetBoard() {
         // Fill pawns
         for (int col = 1; col <= 8; ++col) {
-            addPiece(new ChessPosition(2,col), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-            addPiece(new ChessPosition(7,col), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(2, col), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(7, col), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
 
         int col = 1;
-        for (var piece: new ChessPiece.PieceType[]{
+        for (var piece : new ChessPiece.PieceType[]{
                 ChessPiece.PieceType.ROOK,
                 ChessPiece.PieceType.KNIGHT,
                 ChessPiece.PieceType.BISHOP,
@@ -80,8 +79,8 @@ public class ChessBoard {
                 ChessPiece.PieceType.KNIGHT,
                 ChessPiece.PieceType.ROOK
         }) {
-            addPiece(new ChessPosition(1,col), new ChessPiece(ChessGame.TeamColor.WHITE, piece));
-            addPiece(new ChessPosition(8,col), new ChessPiece(ChessGame.TeamColor.BLACK, piece));
+            addPiece(new ChessPosition(1, col), new ChessPiece(ChessGame.TeamColor.WHITE, piece));
+            addPiece(new ChessPosition(8, col), new ChessPiece(ChessGame.TeamColor.BLACK, piece));
             ++col;
         }
 
@@ -116,7 +115,7 @@ public class ChessBoard {
     @Override
     public String toString() {
         var sb = new StringBuilder();
-        for (ChessPiece[] row: board) {
+        for (ChessPiece[] row : board) {
             sb.append(Arrays.toString(row));
         }
         return sb.toString();

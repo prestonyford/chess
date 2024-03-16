@@ -45,21 +45,27 @@ public class EscapeSequences {
     public static final String SET_BG_COLOR_BLUE = SET_BG_COLOR + "12m";
     public static final String SET_BG_COLOR_MAGENTA = SET_BG_COLOR + "5m";
     public static final String SET_BG_COLOR_WHITE = SET_BG_COLOR + "15m";
+
+
+    public static final String SET_BG_COLOR_BEIGE = SET_BG_COLOR + "222m";
+    public static final String SET_BG_COLOR_BROWN = SET_BG_COLOR + "136m";
+    public static final String SET_BG_COLOR_BORDER = SET_BG_COLOR + "94m";
+
     public static final String RESET_BG_COLOR = UNICODE_ESCAPE + "[0m";
 
-    public static final String WHITE_KING = " ♔ ";
-    public static final String WHITE_QUEEN = " ♕ ";
-    public static final String WHITE_BISHOP = " ♗ ";
-    public static final String WHITE_KNIGHT = " ♘ ";
-    public static final String WHITE_ROOK = " ♖ ";
-    public static final String WHITE_PAWN = " ♙ ";
-    public static final String BLACK_KING = " ♚ ";
-    public static final String BLACK_QUEEN = " ♛ ";
-    public static final String BLACK_BISHOP = " ♝ ";
-    public static final String BLACK_KNIGHT = " ♞ ";
-    public static final String BLACK_ROOK = " ♜ ";
-    public static final String BLACK_PAWN = " ♟ ";
-    public static final String EMPTY = " \u2003 ";
+    public static final String WHITE_KING = "\u2004♔\u2004";
+    public static final String WHITE_QUEEN = "\u2004♕\u2004";
+    public static final String WHITE_BISHOP = "\u2004♗\u2004";
+    public static final String WHITE_KNIGHT = "\u2004♘\u2004";
+    public static final String WHITE_ROOK = "\u2004♖\u2004";
+    public static final String WHITE_PAWN = "\u2004♙\u2004";
+    public static final String BLACK_KING = "\u2004♚\u2004";
+    public static final String BLACK_QUEEN = "\u2004♛\u2004";
+    public static final String BLACK_BISHOP = "\u2004♝\u2004";
+    public static final String BLACK_KNIGHT = "\u2004♞\u2004";
+    public static final String BLACK_ROOK = "\u2004♜\u2004";
+    public static final String BLACK_PAWN = "\u2004♟\u2004";
+    public static final String EMPTY = "\u2004\u2003\u2004";
 
     public static String moveCursorToLocation(int x, int y) {
         return UNICODE_ESCAPE + "[" + y + ";" + x + "H";
