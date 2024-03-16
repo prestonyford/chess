@@ -53,6 +53,8 @@ public class EscapeSequences {
 
     public static final String RESET_BG_COLOR = UNICODE_ESCAPE + "[0m";
 
+
+    // Unicode chess pieces
     public static final String WHITE_KING = "\u2004♔\u2004";
     public static final String WHITE_QUEEN = "\u2004♕\u2004";
     public static final String WHITE_BISHOP = "\u2004♗\u2004";
@@ -66,6 +68,21 @@ public class EscapeSequences {
     public static final String BLACK_ROOK = "\u2004♜\u2004";
     public static final String BLACK_PAWN = "\u2004♟\u2004";
     public static final String EMPTY = "\u2004\u2003\u2004";
+
+    // Alphabetic chess pieces
+    public static final String WHITE_KING_ALPHA = "\u2005\u2005K\u2005\u2005";
+    public static final String WHITE_QUEEN_ALPHA = "\u2005\u2005Q\u2005\u2005";
+    public static final String WHITE_BISHOP_ALPHA = "\u2005\u2005B\u2005\u2005";
+    public static final String WHITE_KNIGHT_ALPHA = "\u2005\u2005N\u2005\u2005";
+    public static final String WHITE_ROOK_ALPHA = "\u2005\u2005R\u2005\u2005";
+    public static final String WHITE_PAWN_ALPHA = "\u2005\u2005P\u2005\u2005";
+    public static final String BLACK_KING_ALPHA = WHITE_KING_ALPHA;
+    public static final String BLACK_QUEEN_ALPHA = WHITE_QUEEN_ALPHA;
+    public static final String BLACK_BISHOP_ALPHA = WHITE_BISHOP_ALPHA;
+    public static final String BLACK_KNIGHT_ALPHA = WHITE_KNIGHT_ALPHA;
+    public static final String BLACK_ROOK_ALPHA = WHITE_ROOK_ALPHA;
+    public static final String BLACK_PAWN_ALPHA = WHITE_PAWN_ALPHA;
+    public static final String EMPTY_ALPHA = "\u2005\u2005 \u2005\u2005";
 
     public static String moveCursorToLocation(int x, int y) {
         return UNICODE_ESCAPE + "[" + y + ";" + x + "H";

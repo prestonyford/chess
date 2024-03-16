@@ -7,16 +7,19 @@ import chess.ChessPosition;
 import chess.dataModel.request.*;
 import chess.dataModel.response.*;
 import client.exception.ResponseException;
+import client.ui.PieceConfig;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import static client.ui.EscapeSequences.*;
+import static client.ui.EscapeSequences.WHITE_ROOK_ALPHA;
 
 public class ChessClient {
     private final ServerFacade serverFacade;
     private State state = State.LOGGED_OUT;
+    private boolean unicodePrint = true;
 
     public ChessClient(String serverUrl) throws MalformedURLException, URISyntaxException {
         serverFacade = new ServerFacade(serverUrl);
@@ -34,6 +37,7 @@ public class ChessClient {
                 case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);
+                case "unicode" -> setUnicodePrint(params);
                 case "logout" -> logout();
                 case "quit" -> "quit";
                 default -> help();
@@ -124,6 +128,7 @@ public class ChessClient {
             return """
                     register <USERNAME> <PASSWORD> <EMAIL> - to create an account
                     login <USERNAME> <PASSWORD> - to log in and access games
+                    unicode [TRUE|FALSE] - print with unicode if true or regular characters if false
                     quit - exit the application
                     help - what you're looking at now""";
         }
@@ -133,8 +138,25 @@ public class ChessClient {
                 join <ID> [WHITE|BLANK|<empty>] - join a game
                 observe <ID> - spectate a game
                 logout - logout
+                unicode [TRUE|FALSE] - print with unicode if true or regular characters if false
                 quit - quit
                 help - what you're looking at now""";
+    }
+
+    public String setUnicodePrint(String[] params) throws ResponseException {
+        if (params.length != 1) {
+            throw new ResponseException(400, "Expected: [TRUE|FALSE]");
+        }
+        String arg = params[0].toLowerCase();
+        if (arg.equals("true")) {
+            unicodePrint = true;
+            return "Unicode ENABLED";
+        } else if (arg.equals("false")) {
+            unicodePrint = false;
+            return "Unicode DISABLED";
+        } else {
+            throw new ResponseException(400, "Expected: [TRUE|FALSE]");
+        }
     }
 
     public String stringBoard(ChessBoard board, boolean invert) {
@@ -193,29 +215,37 @@ public class ChessClient {
             sb.append(SET_TEXT_COLOR_BLACK);
         }
 
+        if (unicodePrint) {
+            stringBuildPiece(sb, teamColor, piece, PieceConfig.unicode);
+        } else {
+            stringBuildPiece(sb, teamColor, piece, PieceConfig.alphabetic);
+        }
+    }
+
+    private void stringBuildPiece(StringBuilder sb, ChessGame.TeamColor teamColor, ChessPiece.PieceType piece, PieceConfig config) {
         if (piece != null) {
             switch (piece) {
                 case KING:
-                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? WHITE_KING : BLACK_KING);
+                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? config.whiteKing() : config.blackKing());
                     break;
                 case QUEEN:
-                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? WHITE_QUEEN : BLACK_QUEEN);
+                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? config.whiteQueen() : config.blackQueen());
                     break;
                 case KNIGHT:
-                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? WHITE_KNIGHT : BLACK_KNIGHT);
+                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? config.whiteKnight() : config.blackKnight());
                     break;
                 case BISHOP:
-                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? WHITE_BISHOP : BLACK_BISHOP);
+                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? config.whiteBishop() : config.blackBishop());
                     break;
                 case ROOK:
-                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? WHITE_ROOK : BLACK_ROOK);
+                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? config.whiteRook() : config.blackRook());
                     break;
                 case PAWN:
-                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? WHITE_PAWN : BLACK_PAWN);
+                    sb.append(teamColor == ChessGame.TeamColor.WHITE ? config.whitePawn() : config.blackPawn());
                     break;
             }
         } else {
-            sb.append(EMPTY);
+            sb.append(config.empty());
         }
     }
 }
