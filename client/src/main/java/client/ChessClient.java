@@ -104,9 +104,11 @@ public class ChessClient {
                 params[1],
                 gameID
         ));
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
         return String.format("Successfully joined game %d\n%s\n\n%s\n", gameID,
-                stringBoard(new ChessBoard(), false),
-                stringBoard(new ChessBoard(), true)
+                stringBoard(board, false),
+                stringBoard(board, true)
         );
     }
 
@@ -121,9 +123,11 @@ public class ChessClient {
         if (params.length != 1) {
             throw new ResponseException(400, "Expected: <ID>");
         }
-        return String.format("Observing game %s:\n%s\n\n%s", params[0],
-                stringBoard(new ChessBoard(), false),
-                stringBoard(new ChessBoard(), true)
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
+        return String.format("Successfully joined game %s\n%s\n\n%s\n", params[0],
+                stringBoard(board, false),
+                stringBoard(board, true)
         );
     }
 

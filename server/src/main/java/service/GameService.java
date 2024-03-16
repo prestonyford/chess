@@ -39,10 +39,6 @@ public class GameService extends Service {
     public void joinGame(String authToken, JoinGameRequest joinGameRequest) throws ServiceException, DataAccessException {
         verifyAuthToken(authToken);
         // Do not call verifyRequestFields because an empty playerColor is valid
-        if (joinGameRequest.gameID() == 0) {
-            throw new ServiceException(400, "Error: bad request");
-        }
-
         AuthData auth = db.getAuth(authToken);
         GameData gameData = db.getGame(joinGameRequest.gameID());
 
