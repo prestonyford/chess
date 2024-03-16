@@ -98,7 +98,10 @@ public class ChessClient {
                 params[1],
                 gameID
         ));
-        return String.format("Successfully joined game %d\n%s", gameID, stringBoard(new ChessBoard()));
+        return String.format("Successfully joined game %d\n%s\n\n%s\n", gameID,
+                stringBoard(new ChessBoard(), false),
+                stringBoard(new ChessBoard(), true)
+        );
     }
 
     public String list() throws ResponseException {
@@ -110,7 +113,10 @@ public class ChessClient {
         if (params.length != 1) {
             throw new ResponseException(400, "Expected: <ID>");
         }
-        return "";
+        return String.format("Observing game %s:\n%s\n\n%s\n", params[0],
+                stringBoard(new ChessBoard(), false),
+                stringBoard(new ChessBoard(), true)
+        );
     }
 
     public String help() {
@@ -131,19 +137,19 @@ public class ChessClient {
                 help - what you're looking at now""";
     }
 
-    public String stringBoard(ChessBoard board) {
+    public String stringBoard(ChessBoard board, boolean invert) {
+        int up = invert ? 1 : 8;
+        int down = invert ? 8 : 1;
+        int diff = invert ? -1 : 1;
+
         StringBuilder sb = new StringBuilder();
         ChessGame.TeamColor tileColor = ChessGame.TeamColor.WHITE;
-        borderCell(sb, ' ');
-        for (char i = 'A'; i < 'A' + 8; ++i) {
-            borderCell(sb, i);
-        }
-        borderCell(sb, ' ');
+        topBottomCells(sb, invert);
         sb.append(RESET_BG_COLOR + '\n');
-        for (int row = 8; row >= 1; --row) {
+        for (int row = up; (!invert && row >= down) || (invert && row <= down); row -= diff) {
             tileColor = tileColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
             borderCell(sb, (char) ('1' - 1 + row));
-            for (int col = 1; col <= 8; ++col) {
+            for (int col = down; (!invert && col <= up) || (invert && col >= up); col += diff) {
                 tileColor = tileColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                 ChessGame.TeamColor teamColor = piece == null ? null : piece.getTeamColor();
@@ -152,17 +158,20 @@ public class ChessClient {
             borderCell(sb, (char) ('1' - 1 + row));
             sb.append(RESET_BG_COLOR + "\n");
         }
-        borderCell(sb, ' ');
-        for (char i = 'A'; i < 'A' + 8; ++i) {
-            borderCell(sb, i);
-        }
-        borderCell(sb, ' ');
+        topBottomCells(sb, invert);
         sb.append(RESET_BG_COLOR + RESET_TEXT_COLOR);
         return sb.toString();
     }
 
-    public String stringOppositeBoard() {
-        return "";
+    private void topBottomCells(StringBuilder sb, boolean invert) {
+        int up = invert ? 1 : 8;
+        int down = invert ? 8 : 1;
+        char diff = (char) (invert ? -1 : 1);
+        borderCell(sb, ' ');
+        for (char i = (char) ('A' - 1 + down); (!invert && i < 'A' + up) || (invert && i >= 'A' - 1 + up); i += diff) {
+            borderCell(sb, i);
+        }
+        borderCell(sb, ' ');
     }
 
     private void borderCell(StringBuilder sb, char symbol) {
@@ -170,12 +179,6 @@ public class ChessClient {
         sb.append("\u2005\u2005");
         sb.append(symbol);
         sb.append("\u2005\u2005");
-    }
-
-    private void coordCell(StringBuilder sb, char c) {
-        sb.append(SET_BG_COLOR_LIGHT_GREY);
-        sb.append(SET_TEXT_COLOR_BLACK);
-        sb.append(c);
     }
 
     private void tileCell(StringBuilder sb, ChessGame.TeamColor tileColor, ChessGame.TeamColor teamColor, ChessPiece.PieceType piece) {
