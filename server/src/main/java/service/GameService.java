@@ -45,6 +45,11 @@ public class GameService extends Service {
 
         AuthData auth = db.getAuth(authToken);
         GameData gameData = db.getGame(joinGameRequest.gameID());
+
+        if (gameData == null) {
+            throw new ServiceException(400, "Error: bad request");
+        }
+
         GameData updatedGame;
 
         if (joinGameRequest.playerColor() != null && Objects.equals(joinGameRequest.playerColor().toUpperCase(), "WHITE")) {

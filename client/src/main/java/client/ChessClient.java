@@ -72,12 +72,14 @@ public class ChessClient {
     }
 
     public String logout() throws ResponseException {
+        assertLoggedIn();
         serverFacade.logout();
         state = State.LOGGED_OUT;
         return "Successfully logged out";
     }
 
     public String create(String[] params) throws ResponseException {
+        assertLoggedIn();
         if (params.length != 1) {
             throw new ResponseException(400, "Expected: <NAME>");
         }
@@ -88,6 +90,7 @@ public class ChessClient {
     }
 
     public String join(String[] params) throws ResponseException {
+        assertLoggedIn();
         if (params.length != 2) {
             throw new ResponseException(400, "Expected: <ID> [WHITE|BLANK|<empty>]");
         }
@@ -108,11 +111,13 @@ public class ChessClient {
     }
 
     public String list() throws ResponseException {
+        assertLoggedIn();
         ListGamesResponse response = serverFacade.listGames();
         return response.toString();
     }
 
     public String observe(String[] params) throws ResponseException {
+        assertLoggedIn();
         if (params.length != 1) {
             throw new ResponseException(400, "Expected: <ID>");
         }
@@ -134,11 +139,10 @@ public class ChessClient {
         return """
                 create <NAME> - create a game with the given name
                 list - list games
-                join <ID> [WHITE|BLANK|<empty>] - join a game
+                join <ID> [WHITE|BLANK] - join a game
                 observe <ID> - spectate a game
                 logout - logout
                 unicode [TRUE|FALSE] - print with unicode if true or regular characters if false
-                quit - quit
                 help - what you're looking at now""";
     }
 
@@ -158,7 +162,13 @@ public class ChessClient {
         }
     }
 
-    public String stringBoard(ChessBoard board, boolean invert) {
+    private void assertLoggedIn() throws ResponseException {
+        if (state != State.LOGGED_IN) {
+            throw new ResponseException(400, "Unauthorized");
+        }
+    }
+
+    private String stringBoard(ChessBoard board, boolean invert) {
         int up = invert ? 1 : 8;
         int down = invert ? 8 : 1;
         int diff = invert ? -1 : 1;

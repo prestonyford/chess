@@ -51,7 +51,7 @@ public class EscapeSequences {
     public static final String SET_BG_COLOR_BROWN = SET_BG_COLOR + "136m";
     public static final String SET_BG_COLOR_BORDER = SET_BG_COLOR + "94m";
 
-    public static final String RESET_BG_COLOR = UNICODE_ESCAPE + "[0m";
+    public static final String RESET_BG_COLOR = UNICODE_ESCAPE + "[49m";
 
 
     // Unicode chess pieces
