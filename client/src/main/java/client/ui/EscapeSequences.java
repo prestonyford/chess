@@ -5,8 +5,8 @@ package client.ui;
  */
 public class EscapeSequences {
 
-    private static final String UNICODE_ESCAPE = "\u001b";
-    private static final String ANSI_ESCAPE = "\033";
+    public static final String UNICODE_ESCAPE = "\u001b";
+    public static final String ANSI_ESCAPE = "\033";
 
     public static final String ERASE_SCREEN = UNICODE_ESCAPE + "[H" + UNICODE_ESCAPE + "[2J";
     public static final String ERASE_LINE = UNICODE_ESCAPE + "[2K";
@@ -70,12 +70,12 @@ public class EscapeSequences {
     public static final String EMPTY = "\u2004\u2003\u2004";
 
     // Alphabetic chess pieces
-    public static final String WHITE_KING_ALPHA = "\u2005\u2005K\u2005\u2005";
-    public static final String WHITE_QUEEN_ALPHA = "\u2005\u2005Q\u2005\u2005";
-    public static final String WHITE_BISHOP_ALPHA = "\u2005\u2005B\u2005\u2005";
-    public static final String WHITE_KNIGHT_ALPHA = "\u2005\u2005N\u2005\u2005";
-    public static final String WHITE_ROOK_ALPHA = "\u2005\u2005R\u2005\u2005";
-    public static final String WHITE_PAWN_ALPHA = "\u2005\u2005P\u2005\u2005";
+    public static final String WHITE_KING_ALPHA = SET_TEXT_BOLD + "\u2005\u2005K\u2005\u2005" + RESET_TEXT_BOLD_FAINT;
+    public static final String WHITE_QUEEN_ALPHA = SET_TEXT_BOLD + "\u2005\u2005Q\u2005\u2005" + RESET_TEXT_BOLD_FAINT;
+    public static final String WHITE_BISHOP_ALPHA = SET_TEXT_BOLD + "\u2005\u2005B\u2005\u2005" + RESET_TEXT_BOLD_FAINT;
+    public static final String WHITE_KNIGHT_ALPHA = SET_TEXT_BOLD + "\u2005\u2005N\u2005\u2005" + RESET_TEXT_BOLD_FAINT;
+    public static final String WHITE_ROOK_ALPHA = SET_TEXT_BOLD + "\u2005\u2005R\u2005\u2005" + RESET_TEXT_BOLD_FAINT;
+    public static final String WHITE_PAWN_ALPHA = SET_TEXT_BOLD + "\u2005\u2005P\u2005\u2005" + RESET_TEXT_BOLD_FAINT;
     public static final String BLACK_KING_ALPHA = WHITE_KING_ALPHA;
     public static final String BLACK_QUEEN_ALPHA = WHITE_QUEEN_ALPHA;
     public static final String BLACK_BISHOP_ALPHA = WHITE_BISHOP_ALPHA;

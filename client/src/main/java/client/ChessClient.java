@@ -7,14 +7,13 @@ import chess.ChessPosition;
 import chess.dataModel.request.*;
 import chess.dataModel.response.*;
 import client.exception.ResponseException;
-import client.ui.PieceConfig;
+import client.ui.PrintConfig;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import static client.ui.EscapeSequences.*;
-import static client.ui.EscapeSequences.WHITE_ROOK_ALPHA;
 
 public class ChessClient {
     private final ServerFacade serverFacade;
@@ -117,7 +116,7 @@ public class ChessClient {
         if (params.length != 1) {
             throw new ResponseException(400, "Expected: <ID>");
         }
-        return String.format("Observing game %s:\n%s\n\n%s\n", params[0],
+        return String.format("Observing game %s:\n%s\n\n%s", params[0],
                 stringBoard(new ChessBoard(), false),
                 stringBoard(new ChessBoard(), true)
         );
@@ -166,44 +165,44 @@ public class ChessClient {
 
         StringBuilder sb = new StringBuilder();
         ChessGame.TeamColor tileColor = ChessGame.TeamColor.WHITE;
-        topBottomCells(sb, invert);
+        stringBuildBottomTop(sb, invert);
         sb.append(RESET_BG_COLOR + '\n');
         for (int row = up; (!invert && row >= down) || (invert && row <= down); row -= diff) {
             tileColor = tileColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
-            borderCell(sb, (char) ('1' - 1 + row));
+            stringBuildBorder(sb, (char) ('1' - 1 + row));
             for (int col = down; (!invert && col <= up) || (invert && col >= up); col += diff) {
                 tileColor = tileColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                 ChessGame.TeamColor teamColor = piece == null ? null : piece.getTeamColor();
-                tileCell(sb, tileColor, teamColor, piece == null ? null : piece.getPieceType());
+                stringBuildTile(sb, tileColor, teamColor, piece == null ? null : piece.getPieceType());
             }
-            borderCell(sb, (char) ('1' - 1 + row));
+            stringBuildBorder(sb, (char) ('1' - 1 + row));
             sb.append(RESET_BG_COLOR + "\n");
         }
-        topBottomCells(sb, invert);
+        stringBuildBottomTop(sb, invert);
         sb.append(RESET_BG_COLOR + RESET_TEXT_COLOR);
         return sb.toString();
     }
 
-    private void topBottomCells(StringBuilder sb, boolean invert) {
+    private void stringBuildBottomTop(StringBuilder sb, boolean invert) {
         int up = invert ? 1 : 8;
         int down = invert ? 8 : 1;
         char diff = (char) (invert ? -1 : 1);
-        borderCell(sb, ' ');
+        stringBuildBorder(sb, ' ');
         for (char i = (char) ('A' - 1 + down); (!invert && i < 'A' + up) || (invert && i >= 'A' - 1 + up); i += diff) {
-            borderCell(sb, i);
+            stringBuildBorder(sb, i);
         }
-        borderCell(sb, ' ');
+        stringBuildBorder(sb, ' ');
     }
 
-    private void borderCell(StringBuilder sb, char symbol) {
+    private void stringBuildBorder(StringBuilder sb, char symbol) {
         sb.append(SET_BG_COLOR_BORDER + SET_TEXT_COLOR_WHITE);
         sb.append("\u2005\u2005");
         sb.append(symbol);
         sb.append("\u2005\u2005");
     }
 
-    private void tileCell(StringBuilder sb, ChessGame.TeamColor tileColor, ChessGame.TeamColor teamColor, ChessPiece.PieceType piece) {
+    private void stringBuildTile(StringBuilder sb, ChessGame.TeamColor tileColor, ChessGame.TeamColor teamColor, ChessPiece.PieceType piece) {
         if (tileColor == ChessGame.TeamColor.WHITE) {
             sb.append(SET_BG_COLOR_BEIGE);
         } else {
@@ -216,13 +215,13 @@ public class ChessClient {
         }
 
         if (unicodePrint) {
-            stringBuildPiece(sb, teamColor, piece, PieceConfig.unicode);
+            stringBuildPiece(sb, teamColor, piece, PrintConfig.unicode);
         } else {
-            stringBuildPiece(sb, teamColor, piece, PieceConfig.alphabetic);
+            stringBuildPiece(sb, teamColor, piece, PrintConfig.alphabetic);
         }
     }
 
-    private void stringBuildPiece(StringBuilder sb, ChessGame.TeamColor teamColor, ChessPiece.PieceType piece, PieceConfig config) {
+    private void stringBuildPiece(StringBuilder sb, ChessGame.TeamColor teamColor, ChessPiece.PieceType piece, PrintConfig config) {
         if (piece != null) {
             switch (piece) {
                 case KING:
