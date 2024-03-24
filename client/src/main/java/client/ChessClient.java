@@ -20,8 +20,8 @@ public class ChessClient {
     private State state = State.LOGGED_OUT;
     private boolean unicodePrint = true;
 
-    public ChessClient(String serverUrl) throws MalformedURLException, URISyntaxException {
-        serverFacade = new ServerFacade(serverUrl);
+    public ChessClient(String domainName) throws MalformedURLException, URISyntaxException {
+        serverFacade = new ServerFacade(domainName);
     }
 
     public String eval(String input) {

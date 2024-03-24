@@ -19,8 +19,8 @@ public class ServerFacade {
     private final String serverUrl;
     private String authToken;
 
-    public ServerFacade(String url) throws URISyntaxException, MalformedURLException {
-        this.serverUrl = url;
+    public ServerFacade(String domainName) throws URISyntaxException, MalformedURLException {
+        this.serverUrl = "http://" + domainName;
     }
 
     public void clearDB() throws ResponseException {

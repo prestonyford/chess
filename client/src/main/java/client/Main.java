@@ -2,10 +2,10 @@ package client;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        String serverUrl = "http://localhost:8080";
+        String domainName = "localhost:8080";
         if (args.length == 1) {
-            serverUrl = args[0];
+            domainName = args[0];
         }
-        new Repl(serverUrl).run();
+        new Repl(domainName).run();
     }
 }

@@ -48,6 +48,8 @@ public class Server {
                 res.body(ex.getMessage());
             });
 
+            Spark.webSocket("/connect", webSocketHandler);
+
             // Handle endpoints
             Spark.delete("/db", (req, res) -> {
                 applicationService.bigRedButton();
@@ -109,8 +111,6 @@ public class Server {
                 res.body(body);
                 return body;
             });
-
-            Spark.webSocket("/connect", webSocketHandler);
 
             Spark.awaitInitialization();
             return Spark.port();

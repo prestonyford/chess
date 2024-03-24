@@ -9,8 +9,8 @@ import static client.ui.EscapeSequences.*;
 public class Repl {
     private final ChessClient client;
 
-    public Repl(String serverUrl) throws MalformedURLException, URISyntaxException {
-        client = new ChessClient(serverUrl);
+    public Repl(String domainName) throws MalformedURLException, URISyntaxException {
+        client = new ChessClient(domainName);
     }
 
     public void run() {
