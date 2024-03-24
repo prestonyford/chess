@@ -13,6 +13,7 @@ import dataAccess.DataAccess;
 import dataAccess.DataAccessException;
 import dataAccess.MemoryDataAccess;
 import dataAccess.SQLDataAccess;
+import server.websocket.WebSocketHandler;
 import service.ApplicationService;
 import service.GameService;
 import service.UserService;
@@ -32,6 +33,7 @@ public class Server {
             UserService userService = new UserService(db);
             GameService gameService = new GameService(db);
             ApplicationService applicationService = new ApplicationService(db);
+            WebSocketHandler webSocketHandler = new WebSocketHandler();
 
             // Handle all endpoint ServiceExceptions
             Spark.exception(ServiceException.class, (ex, req, res) -> {
@@ -107,6 +109,8 @@ public class Server {
                 res.body(body);
                 return body;
             });
+
+            Spark.webSocket("/connect", webSocketHandler);
 
             Spark.awaitInitialization();
             return Spark.port();
