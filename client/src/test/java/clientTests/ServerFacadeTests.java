@@ -15,6 +15,8 @@ import client.exception.ResponseException;
 import org.junit.jupiter.api.*;
 import server.Server;
 
+import java.util.Set;
+
 public class ServerFacadeTests {
 
     private static Server server;
@@ -24,7 +26,8 @@ public class ServerFacadeTests {
     public static void init() throws Exception {
         server = new Server();
         var port = server.run(0);
-        serverFacade = new ServerFacade("http://localhost:" + port);
+        serverFacade = new ServerFacade("localhost:" + port, (serverMessage) -> {
+        }); // Empty WS handler
         System.out.println("Started test HTTP server on " + port);
     }
 
@@ -241,23 +244,23 @@ public class ServerFacadeTests {
         serverFacade.joinGame(new JoinGameRequest("WHITE", game1Response.gameID()));
         serverFacade.joinGame(new JoinGameRequest("BLACK", game2Response.gameID()));
         ListGamesResponse listGamesResponse = serverFacade.listGames();
-        Assertions.assertArrayEquals(new GameData[]{
-                        new GameData(
-                                game1Response.gameID(),
-                                "Ponyo",
-                                null,
-                                "New Game",
-                                new ChessGame()
-                        ),
-                        new GameData(
-                                game2Response.gameID(),
-                                null,
-                                "Ponyo",
-                                "New Game2",
-                                new ChessGame()
-                        )
-                },
-                listGamesResponse.games());
+        GameData[] expected = {
+                new GameData(
+                        game1Response.gameID(),
+                        "Ponyo",
+                        null,
+                        "New Game",
+                        new ChessGame()
+                ),
+                new GameData(
+                        game2Response.gameID(),
+                        null,
+                        "Ponyo",
+                        "New Game2",
+                        new ChessGame()
+                )
+        };
+        Assertions.assertArrayEquals(expected, listGamesResponse.games());
     }
 
     @Test

@@ -1,16 +1,21 @@
 package client;
 
+import client.webSocket.WebSocketMessageHandler;
+import webSocketMessages.serverMessages.ServerMessage;
+
+import javax.websocket.DeploymentException;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Scanner;
 
 import static client.ui.EscapeSequences.*;
 
-public class Repl {
+public class Repl implements WebSocketMessageHandler {
     private final ChessClient client;
 
-    public Repl(String domainName) throws MalformedURLException, URISyntaxException {
-        client = new ChessClient(domainName);
+    public Repl(String domainName) throws IOException, URISyntaxException, DeploymentException {
+        client = new ChessClient(domainName, this);
     }
 
     public void run() {
@@ -31,5 +36,10 @@ public class Repl {
 
     private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
+    }
+
+    @Override
+    public void onServerMessage(ServerMessage serverMessage) {
+        System.out.println(serverMessage);
     }
 }
