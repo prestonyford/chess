@@ -24,7 +24,7 @@ import java.util.Map;
 public class HttpCommunicator {
     private final String serverUrl;
 
-    public HttpCommunicator(String domainName) throws URISyntaxException, MalformedURLException {
+    public HttpCommunicator(String domainName) {
         this.serverUrl = "http://" + domainName;
     }
 

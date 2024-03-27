@@ -3,6 +3,7 @@ package client;
 import java.io.IOException;
 import java.net.*;
 
+import chess.ChessGame;
 import chess.dataModel.request.CreateGameRequest;
 import chess.dataModel.request.JoinGameRequest;
 import chess.dataModel.request.LoginRequest;
@@ -14,18 +15,22 @@ import chess.dataModel.response.RegisterResponse;
 import client.http.HttpCommunicator;
 import client.exception.ResponseException;
 import client.webSocket.WebSocketCommunicator;
+import webSocketMessages.userCommands.JoinPlayerCommand;
 
 import javax.websocket.DeploymentException;
 import javax.websocket.MessageHandler;
 
 public class ServerFacade {
     private final HttpCommunicator httpCommunicator;
-    private final WebSocketCommunicator webSocketCommunicator;
+    private WebSocketCommunicator webSocketCommunicator;
+    private String domainName;
+    private MessageHandler.Whole<String> wsMessageHandler;
     private String authToken;
 
-    public ServerFacade(String domainName, MessageHandler.Whole<String> wsMessageHandler) throws URISyntaxException, IOException, DeploymentException {
+    public ServerFacade(String domainName, MessageHandler.Whole<String> wsMessageHandler) {
+        this.domainName = domainName;
+        this.wsMessageHandler = wsMessageHandler;
         httpCommunicator = new HttpCommunicator(domainName);
-        webSocketCommunicator = new WebSocketCommunicator(domainName, wsMessageHandler);
     }
 
     public void clearDB() throws ResponseException {
@@ -41,6 +46,7 @@ public class ServerFacade {
     public LoginResponse login(LoginRequest request) throws ResponseException {
         LoginResponse response = httpCommunicator.login(request);
         authToken = response.authToken();
+        webSocketCommunicator = new WebSocketCommunicator(domainName, wsMessageHandler);
         return response;
     }
 
@@ -55,6 +61,12 @@ public class ServerFacade {
 
     public void joinGame(JoinGameRequest request) throws ResponseException {
         httpCommunicator.joinGame(request, authToken);
+        webSocketCommunicator.joinPlayer(new JoinPlayerCommand(
+                authToken,
+                request.gameID(),
+                // TODO: Refactor to use enums instead of strings in JoinGameRequest and similar
+                request.playerColor().equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK
+        ));
     }
 
     public ListGamesResponse listGames() throws ResponseException {
