@@ -1,5 +1,7 @@
 package client.webSocket;
 
+import com.google.gson.Gson;
+
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
@@ -8,16 +10,11 @@ import java.net.URISyntaxException;
 public class WebSocketCommunicator extends Endpoint {
     public Session session;
 
-    public WebSocketCommunicator(String domainName) throws URISyntaxException, DeploymentException, IOException {
+    public WebSocketCommunicator(String domainName, MessageHandler.Whole<String> wsMessageHandler) throws URISyntaxException, DeploymentException, IOException {
         URI uri = new URI(String.format("ws://%s/connect", domainName));
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, uri);
-        this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-            @Override
-            public void onMessage(String message) {
-                System.out.println(message);
-            }
-        });
+        this.session.addMessageHandler(wsMessageHandler);
     }
 
     public void send(String message) throws IOException {

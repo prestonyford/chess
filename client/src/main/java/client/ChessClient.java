@@ -8,11 +8,10 @@ import chess.dataModel.request.*;
 import chess.dataModel.response.*;
 import client.exception.ResponseException;
 import client.ui.PrintConfig;
-import client.webSocket.WebSocketMessageHandler;
 
 import javax.websocket.DeploymentException;
+import javax.websocket.MessageHandler;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
@@ -23,7 +22,7 @@ public class ChessClient {
     private State state = State.LOGGED_OUT;
     private boolean unicodePrint = true;
 
-    public ChessClient(String domainName, WebSocketMessageHandler wsMessageHandler) throws IOException, URISyntaxException, DeploymentException {
+    public ChessClient(String domainName, MessageHandler.Whole<String> wsMessageHandler) throws IOException, URISyntaxException, DeploymentException {
         serverFacade = new ServerFacade(domainName, wsMessageHandler);
     }
 

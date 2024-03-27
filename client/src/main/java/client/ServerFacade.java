@@ -14,18 +14,18 @@ import chess.dataModel.response.RegisterResponse;
 import client.http.HttpCommunicator;
 import client.exception.ResponseException;
 import client.webSocket.WebSocketCommunicator;
-import client.webSocket.WebSocketMessageHandler;
 
 import javax.websocket.DeploymentException;
+import javax.websocket.MessageHandler;
 
 public class ServerFacade {
     private final HttpCommunicator httpCommunicator;
     private final WebSocketCommunicator webSocketCommunicator;
     private String authToken;
 
-    public ServerFacade(String domainName, WebSocketMessageHandler wsMessageHandler) throws URISyntaxException, IOException, DeploymentException {
+    public ServerFacade(String domainName, MessageHandler.Whole<String> wsMessageHandler) throws URISyntaxException, IOException, DeploymentException {
         httpCommunicator = new HttpCommunicator(domainName);
-        webSocketCommunicator = new WebSocketCommunicator(domainName);
+        webSocketCommunicator = new WebSocketCommunicator(domainName, wsMessageHandler);
     }
 
     public void clearDB() throws ResponseException {

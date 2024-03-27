@@ -1,17 +1,14 @@
 package client;
 
-import client.webSocket.WebSocketMessageHandler;
-import webSocketMessages.serverMessages.ServerMessage;
-
 import javax.websocket.DeploymentException;
+import javax.websocket.MessageHandler;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Scanner;
 
 import static client.ui.EscapeSequences.*;
 
-public class Repl implements WebSocketMessageHandler {
+public class Repl implements MessageHandler.Whole<String> {
     private final ChessClient client;
 
     public Repl(String domainName) throws IOException, URISyntaxException, DeploymentException {
@@ -39,7 +36,12 @@ public class Repl implements WebSocketMessageHandler {
     }
 
     @Override
-    public void onServerMessage(ServerMessage serverMessage) {
-        System.out.println(serverMessage);
+    public void onMessage(String s) {
+
     }
+
+//    @Override
+//    public void onServerMessage(ServerMessage serverMessage) {
+//        System.out.println(serverMessage);
+//    }
 }
