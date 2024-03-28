@@ -2,7 +2,7 @@ package client.webSocket;
 
 import client.exception.ResponseException;
 import com.google.gson.Gson;
-import webSocketMessages.userCommands.JoinPlayerCommand;
+import webSocketMessages.userCommands.JoinPlayer;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class WebSocketCommunicator extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void joinPlayer(JoinPlayerCommand command) throws ResponseException {
+    public void joinPlayer(JoinPlayer command) throws ResponseException {
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {

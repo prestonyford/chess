@@ -7,10 +7,9 @@ import dataAccess.DataAccessException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import webSocketMessages.userCommands.JoinPlayerCommand;
+import webSocketMessages.userCommands.JoinPlayer;
 import webSocketMessages.userCommands.UserGameCommand;
 
-import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 @WebSocket
@@ -29,12 +28,12 @@ public class WebSocketHandler {
         UserGameCommand command = new Gson().fromJson(s, UserGameCommand.class);
         switch (command.getCommandType()) {
             case JOIN_PLAYER:
-                JoinPlayerCommand joinPlayerCommand = new Gson().fromJson(s, JoinPlayerCommand.class);
-                if (!gameRooms.containsKey(joinPlayerCommand.getGameID())) {
-                    gameRooms.put(joinPlayerCommand.getGameID(), new ConnectionManager());
+                JoinPlayer joinPlayer = new Gson().fromJson(s, JoinPlayer.class);
+                if (!gameRooms.containsKey(joinPlayer.getGameID())) {
+                    gameRooms.put(joinPlayer.getGameID(), new ConnectionManager());
                 }
-                AuthData user = db.getAuth(joinPlayerCommand.getAuthString());
-                gameRooms.get(joinPlayerCommand.getGameID()).add(user.username(), session);
+                AuthData user = db.getAuth(joinPlayer.getAuthString());
+                gameRooms.get(joinPlayer.getGameID()).add(user.username(), session);
                 break;
         }
     }

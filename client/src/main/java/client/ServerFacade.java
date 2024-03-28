@@ -1,8 +1,5 @@
 package client;
 
-import java.io.IOException;
-import java.net.*;
-
 import chess.ChessGame;
 import chess.dataModel.request.CreateGameRequest;
 import chess.dataModel.request.JoinGameRequest;
@@ -15,9 +12,8 @@ import chess.dataModel.response.RegisterResponse;
 import client.http.HttpCommunicator;
 import client.exception.ResponseException;
 import client.webSocket.WebSocketCommunicator;
-import webSocketMessages.userCommands.JoinPlayerCommand;
+import webSocketMessages.userCommands.JoinPlayer;
 
-import javax.websocket.DeploymentException;
 import javax.websocket.MessageHandler;
 
 public class ServerFacade {
@@ -61,7 +57,7 @@ public class ServerFacade {
     public void joinGame(JoinGameRequest request) throws ResponseException {
         httpCommunicator.joinGame(request, authToken);
         webSocketCommunicator = new WebSocketCommunicator(domainName, wsMessageHandler);
-        webSocketCommunicator.joinPlayer(new JoinPlayerCommand(
+        webSocketCommunicator.joinPlayer(new JoinPlayer(
                 authToken,
                 request.gameID(),
                 // TODO: Refactor to use enums instead of strings in JoinGameRequest and similar
