@@ -33,7 +33,7 @@ public class Server {
             UserService userService = new UserService(db);
             GameService gameService = new GameService(db);
             ApplicationService applicationService = new ApplicationService(db);
-            WebSocketHandler webSocketHandler = new WebSocketHandler();
+            WebSocketHandler webSocketHandler = new WebSocketHandler(db);
 
             // Handle all endpoint ServiceExceptions
             Spark.exception(ServiceException.class, (ex, req, res) -> {

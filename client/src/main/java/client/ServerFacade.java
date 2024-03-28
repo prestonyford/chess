@@ -46,7 +46,6 @@ public class ServerFacade {
     public LoginResponse login(LoginRequest request) throws ResponseException {
         LoginResponse response = httpCommunicator.login(request);
         authToken = response.authToken();
-        webSocketCommunicator = new WebSocketCommunicator(domainName, wsMessageHandler);
         return response;
     }
 
@@ -61,6 +60,7 @@ public class ServerFacade {
 
     public void joinGame(JoinGameRequest request) throws ResponseException {
         httpCommunicator.joinGame(request, authToken);
+        webSocketCommunicator = new WebSocketCommunicator(domainName, wsMessageHandler);
         webSocketCommunicator.joinPlayer(new JoinPlayerCommand(
                 authToken,
                 request.gameID(),
