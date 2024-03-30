@@ -37,7 +37,7 @@ public class Repl implements MessageHandler.Whole<String> {
 
     @Override
     public void onMessage(String s) {
-
+        System.out.println("Received: " + s);
     }
 
 //    @Override

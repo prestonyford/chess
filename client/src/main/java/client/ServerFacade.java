@@ -14,6 +14,7 @@ import client.exception.ResponseException;
 import client.webSocket.WebSocketCommunicator;
 import webSocketMessages.userCommands.JoinPlayer;
 
+import javax.sound.midi.SysexMessage;
 import javax.websocket.MessageHandler;
 
 public class ServerFacade {
@@ -63,6 +64,7 @@ public class ServerFacade {
                 // TODO: Refactor to use enums instead of strings in JoinGameRequest and similar
                 request.playerColor().equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK
         ));
+        System.out.println("Sent to server!");
     }
 
     public ListGamesResponse listGames() throws ResponseException {
