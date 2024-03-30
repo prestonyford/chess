@@ -47,17 +47,21 @@ public class WebSocketHandler {
     @OnWebSocketError
     public void onError(Session session, Throwable error) throws IOException {
         System.out.println(error.getMessage());
-        session.getRemote().sendString("oopsie daisy!");
+        session.getRemote().sendString(
+                new Gson().toJson(new Error(
+                        error.getMessage()
+                ))
+        );
     }
 
-    private void joinPlayer(Connection connection, JoinPlayer message) throws WebSocketException, IOException {
+    private void joinPlayer(Connection connection, JoinPlayer message) throws WebSocketException {
         try {
             GameData game = db.getGame(message.getGameID());
             if (
                     (message.getPlayerColor() == ChessGame.TeamColor.WHITE && !Objects.equals(game.whiteUsername(), connection.visitorName)) ||
                             (message.getPlayerColor() == ChessGame.TeamColor.BLACK && !Objects.equals(game.blackUsername(), connection.visitorName))
             ) {
-                connection.send("Error: Position is occupied");
+                throw new WebSocketException("Error: Position is occupied");
             }
 
             addConnectionToRoom(message.getGameID(), connection);
@@ -67,7 +71,7 @@ public class WebSocketHandler {
             ));
             System.out.println("Sent to client!");
         } catch (IOException | DataAccessException ex) {
-            connection.send(ex.getMessage());
+            throw new WebSocketException(ex.getMessage());
         }
     }
 
