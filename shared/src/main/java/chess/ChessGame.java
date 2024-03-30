@@ -212,7 +212,7 @@ public class ChessGame {
                         !moves.contains(move) ||
                         piece.getTeamColor() != teamTurn
         ) {
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("Invalid move");
         }
 
         // Reset En Passant checks
