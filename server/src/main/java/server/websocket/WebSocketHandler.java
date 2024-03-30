@@ -15,10 +15,12 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.userCommands.JoinObserver;
 import webSocketMessages.userCommands.JoinPlayer;
 import webSocketMessages.userCommands.UserGameCommand;
 
 import javax.sound.midi.SysexMessage;
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +36,13 @@ public class WebSocketHandler {
         this.db = db;
     }
 
+    private void addConnectionToRoom(int gameID, Connection connection) {
+        if (!gameRooms.containsKey(gameID)) {
+            gameRooms.put(gameID, new ConnectionManager());
+        }
+        gameRooms.get(gameID).add(connection);
+    }
+
     @OnWebSocketMessage
     public void onMessage(Session session, String s) throws DataAccessException, IOException {
         UserGameCommand command = new Gson().fromJson(s, UserGameCommand.class);
@@ -41,6 +50,7 @@ public class WebSocketHandler {
         Connection connection = new Connection(user.username(), session);
         switch (command.getCommandType()) {
             case JOIN_PLAYER -> joinPlayer(connection, new Gson().fromJson(s, JoinPlayer.class));
+            case JOIN_OBSERVER -> joinObserver(connection, new Gson().fromJson(s, JoinObserver.class));
         }
     }
 
@@ -61,7 +71,7 @@ public class WebSocketHandler {
                     (message.getPlayerColor() == ChessGame.TeamColor.WHITE && !Objects.equals(game.whiteUsername(), connection.visitorName)) ||
                             (message.getPlayerColor() == ChessGame.TeamColor.BLACK && !Objects.equals(game.blackUsername(), connection.visitorName))
             ) {
-                throw new WebSocketException("Error: Position is occupied");
+                throw new WebSocketException("Position is occupied");
             }
 
             addConnectionToRoom(message.getGameID(), connection);
@@ -69,16 +79,24 @@ public class WebSocketHandler {
             gameRooms.get(message.getGameID()).broadcast(connection.visitorName, new Notification(
                     connection.visitorName + " joined as " + message.getPlayerColor().name()
             ));
-            System.out.println("Sent to client!");
         } catch (IOException | DataAccessException ex) {
             throw new WebSocketException(ex.getMessage());
         }
     }
 
-    private void addConnectionToRoom(int gameID, Connection connection) {
-        if (!gameRooms.containsKey(gameID)) {
-            gameRooms.put(gameID, new ConnectionManager());
+    private void joinObserver(Connection connection, JoinObserver message) throws WebSocketException {
+        try {
+            GameData game = db.getGame(message.getGameID());
+            if (game == null) {
+                throw new WebSocketException("Nonexistent gameID");
+            }
+            addConnectionToRoom(message.getGameID(), connection);
+            connection.send(new Gson().toJson(new LoadGame(game)));
+            gameRooms.get(message.getGameID()).broadcast(connection.visitorName, new Notification(
+                    connection.visitorName + " joined as an observer"
+            ));
+        } catch (IOException | DataAccessException ex) {
+            throw new WebSocketException(ex.getMessage());
         }
-        gameRooms.get(gameID).add(connection);
     }
 }
