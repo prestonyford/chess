@@ -41,9 +41,13 @@ public class WebSocketHandler {
     }
 
     private void assertAuthorizedGameUpdate(GameData gameData, String username, ChessGame.TeamColor teamColor) throws WebSocketException {
+        if (gameData.concluded()) {
+            throw new WebSocketException("Game is already concluded");
+        }
         if (
                 (teamColor == ChessGame.TeamColor.WHITE && !Objects.equals(gameData.whiteUsername(), username)) ||
-                        (teamColor == ChessGame.TeamColor.BLACK && !Objects.equals(gameData.blackUsername(), username))
+                        (teamColor == ChessGame.TeamColor.BLACK && !Objects.equals(gameData.blackUsername(), username)) ||
+                        teamColor == null
         ) {
             throw new WebSocketException("Position is occupied");
         }
@@ -59,7 +63,7 @@ public class WebSocketHandler {
             case JOIN_OBSERVER -> joinObserver(connection, new Gson().fromJson(s, JoinObserver.class));
             case MAKE_MOVE -> makeMove(connection, new Gson().fromJson(s, MakeMove.class));
             case LEAVE -> leave(connection, new Gson().fromJson(s, Leave.class));
-            // case RESIGN ->
+            case RESIGN -> resign(connection, new Gson().fromJson(s, Resign.class));
         }
     }
 
@@ -154,7 +158,32 @@ public class WebSocketHandler {
 
     private void resign(Connection connection, Resign message) throws WebSocketException {
         try {
-
+            GameData game = db.getGame(message.getGameID());
+            ChessGame.TeamColor teamColor;
+            if (Objects.equals(game.whiteUsername(), connection.visitorName)) {
+                teamColor = ChessGame.TeamColor.WHITE;
+            } else if (Objects.equals(game.blackUsername(), connection.visitorName)) {
+                teamColor = ChessGame.TeamColor.BLACK;
+            } else {
+                teamColor = null;
+            }
+            assertAuthorizedGameUpdate(
+                    game,
+                    connection.visitorName,
+                    teamColor
+            );
+            GameData updatedGame = new GameData(
+                    game.gameID(),
+                    game.whiteUsername(),
+                    game.blackUsername(),
+                    game.gameName(),
+                    game.game(),
+                    true
+            );
+            db.updateGame(game.gameID(), updatedGame);
+            gameRooms.get(message.getGameID()).broadcast("", new Notification(
+                    connection.visitorName + " has resigned"
+            ));
         } catch (Exception ex) {
             throw new WebSocketException(ex.getMessage());
         }

@@ -39,6 +39,7 @@ public class SQLDataAccess implements DataAccess {
                     whiteUsername varchar(256),
                     blackUsername varchar(256),
                     game longtext NOT NULL,
+                    concluded boolean DEFAULT FALSE,
                     PRIMARY KEY (gameID)
                 );
                 """;
@@ -169,7 +170,7 @@ public class SQLDataAccess implements DataAccess {
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT gameID, gameName, whiteUsername, blackUsername, game FROM games WHERE gameID=?;";
+            String statement = "SELECT gameID, gameName, whiteUsername, blackUsername, game, concluded FROM games WHERE gameID=?;";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
@@ -180,7 +181,7 @@ public class SQLDataAccess implements DataAccess {
                                 rs.getString("blackUsername"),
                                 rs.getString("gameName"),
                                 new Gson().fromJson(rs.getString("game"), ChessGame.class),
-                                false);
+                                rs.getBoolean("concluded"));
                     } else {
                         return null;
                     }
@@ -193,13 +194,14 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public void updateGame(int gameID, GameData gameData) throws DataAccessException {
-        var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?;";
+        var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, game=?, concluded=? WHERE gameID=?;";
         executeUpdate(
                 statement,
                 gameData.whiteUsername(),
                 gameData.blackUsername(),
                 gameData.gameName(),
                 new Gson().toJson(gameData.game()),
+                gameData.concluded(),
                 gameID
         );
     }
@@ -220,6 +222,7 @@ public class SQLDataAccess implements DataAccess {
                     if (param instanceof String p) ps.setString(i + 1, p);
                     else if (param instanceof Integer p) ps.setInt(i + 1, p);
                     else if (param instanceof ChessGame p) ps.setString(i + 1, new Gson().toJson(p));
+                    else if (param instanceof Boolean p) ps.setBoolean(i + 1, p);
                     else if (param == null) ps.setNull(i + 1, NULL);
                 }
                 ps.executeUpdate();
