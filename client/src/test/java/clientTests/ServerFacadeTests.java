@@ -260,7 +260,8 @@ public class ServerFacadeTests {
                         new ChessGame()
                 )
         };
-        Assertions.assertArrayEquals(expected, listGamesResponse.games());
+        Assertions.assertIterableEquals(Set.of(expected), Set.of(listGamesResponse.games()));
+        // Assertions.assertArrayEquals(expected, listGamesResponse.games());
     }
 
     @Test

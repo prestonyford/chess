@@ -40,6 +40,7 @@ public class SQLDataAccess implements DataAccess {
                     whiteUsername varchar(256),
                     blackUsername varchar(256),
                     game longtext NOT NULL,
+                    concluded boolean DEFAULT FALSE,
                     PRIMARY KEY (gameID)
                 );
                 """;

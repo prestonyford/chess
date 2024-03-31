@@ -62,6 +62,7 @@ public class WebSocketHandler {
             case JOIN_OBSERVER -> joinObserver(connection, new Gson().fromJson(s, JoinObserver.class));
             case MAKE_MOVE -> makeMove(connection, new Gson().fromJson(s, MakeMove.class));
             case LEAVE -> leave(connection, new Gson().fromJson(s, Leave.class));
+            // case RESIGN ->
         }
     }
 
@@ -150,6 +151,14 @@ public class WebSocketHandler {
                     connection.visitorName + " has left the game"
             ));
         } catch (IOException | DataAccessException ex) {
+            throw new WebSocketException(ex.getMessage());
+        }
+    }
+
+    private void resign(Connection connection, Resign message) throws WebSocketException {
+        try {
+
+        } catch (Exception ex) {
             throw new WebSocketException(ex.getMessage());
         }
     }
