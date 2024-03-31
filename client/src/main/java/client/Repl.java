@@ -1,5 +1,11 @@
 package client;
 
+import com.google.gson.Gson;
+import webSocketMessages.serverMessages.Error;
+import webSocketMessages.serverMessages.LoadGame;
+import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.serverMessages.ServerMessage;
+
 import javax.websocket.DeploymentException;
 import javax.websocket.MessageHandler;
 import java.io.IOException;
@@ -8,10 +14,10 @@ import java.util.Scanner;
 
 import static client.ui.EscapeSequences.*;
 
-public class Repl implements MessageHandler.Whole<String> {
+public class Repl implements ClientOutput {
     private final ChessClient client;
 
-    public Repl(String domainName) throws IOException, URISyntaxException, DeploymentException {
+    public Repl(String domainName) {
         client = new ChessClient(domainName, this);
     }
 
@@ -19,29 +25,22 @@ public class Repl implements MessageHandler.Whole<String> {
         System.out.println("♕ Welcome to CS 240 Chess Client ♕" + SET_TEXT_COLOR_BLUE);
         System.out.println(client.help());
         Scanner scanner = new Scanner(System.in);
-        var result = "";
-        while (!result.equals("quit")) {
-            printPrompt();
-            String line = scanner.nextLine();
-
-            result = client.eval(line);
-            System.out.print(SET_TEXT_COLOR_BLUE + result);
-            System.out.print((result.isEmpty()) ? "" : '\n');
+        String line = "";
+        prompt();
+        while (!line.equals("quit")) {
+            line = scanner.nextLine();
+            System.out.print(SET_TEXT_COLOR_BLUE);
+            client.eval(line);
         }
         System.out.println();
     }
 
-    private void printPrompt() {
+    public void prompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
     }
 
     @Override
-    public void onMessage(String s) {
-        System.out.println("Received: " + s);
+    public void output(String message) {
+        System.out.println(message);
     }
-
-//    @Override
-//    public void onServerMessage(ServerMessage serverMessage) {
-//        System.out.println(serverMessage);
-//    }
 }

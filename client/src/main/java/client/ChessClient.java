@@ -8,44 +8,120 @@ import chess.dataModel.request.*;
 import chess.dataModel.response.*;
 import client.exception.ResponseException;
 import client.ui.PrintConfig;
+import com.google.gson.Gson;
+import webSocketMessages.serverMessages.Error;
+import webSocketMessages.serverMessages.LoadGame;
+import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.serverMessages.ServerMessage;
 
 import javax.websocket.DeploymentException;
 import javax.websocket.MessageHandler;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Objects;
 
 import static client.ui.EscapeSequences.*;
 
-public class ChessClient {
+public class ChessClient implements MessageHandler.Whole<String> {
     private final ServerFacade serverFacade;
+    ClientOutput output;
     private State state = State.LOGGED_OUT;
+    private String currentUsername = null;
     private boolean unicodePrint = true;
 
-    public ChessClient(String domainName, MessageHandler.Whole<String> wsMessageHandler) throws IOException, URISyntaxException, DeploymentException {
-        serverFacade = new ServerFacade(domainName, wsMessageHandler);
+    public ChessClient(String domainName, ClientOutput output) {
+        this.serverFacade = new ServerFacade(domainName, this);
+        this.output = output;
     }
 
-    public String eval(String input) {
+    public void eval(String input) {
         String[] tokens = input.toLowerCase().split(" ");
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
         try {
-            return switch (cmd) {
-                case "register" -> register(params);
-                case "login" -> login(params);
-                case "create" -> create(params);
-                case "list" -> list();
-                case "join" -> join(params);
-                case "observe" -> observe(params);
-                case "unicode" -> setUnicodePrint(params);
-                case "logout" -> logout();
-                case "quit" -> "quit";
-                default -> help();
-            };
+            switch (cmd) {
+                case "register": {
+                    this.output.output(register(params));
+                    this.output.prompt();
+                    break;
+                }
+                case "login": {
+                    this.output.output(login(params));
+                    this.output.prompt();
+                    break;
+                }
+                case "create": {
+                    this.output.output(create(params));
+                    this.output.prompt();
+                    break;
+                }
+                case "list": {
+                    this.output.output(list());
+                    this.output.prompt();
+                    break;
+                }
+                case "join": {
+                    this.output.output(join(params));
+                    break;
+                }
+                case "observe": {
+                    this.output.output(observe(params));
+                    break;
+                }
+                case "unicode": {
+                    this.output.output(setUnicodePrint(params));
+                    this.output.prompt();
+                    break;
+                }
+                case "logout": {
+                    this.output.output(logout());
+                    this.output.prompt();
+                    break;
+                }
+                case "quit": {
+                    this.output.output("OK");
+                    break;
+                }
+                default: {
+                    this.output.output(help());
+                    this.output.prompt();
+                    break;
+                }
+            }
+            ;
         } catch (ResponseException e) {
-            return e.getMessage();
+            this.output.output(e.getMessage());
+            this.output.prompt();
         }
+    }
+
+    @Override
+    public void onMessage(String s) {
+        ServerMessage message = new Gson().fromJson(s, ServerMessage.class);
+        switch (message.getServerMessageType()) {
+            case LOAD_GAME -> printGame(new Gson().fromJson(s, LoadGame.class));
+            case NOTIFICATION -> printNotification(new Gson().fromJson(s, Notification.class));
+            case ERROR -> printError(new Gson().fromJson(s, Error.class));
+        }
+    }
+
+    private void printGame(LoadGame message) {
+        this.output.output(stringBoard(
+                message.getGame().game().getBoard(),
+                Objects.equals(currentUsername, message.getGame().blackUsername())
+        ));
+        this.output.prompt();
+    }
+
+    private void printNotification(Notification message) {
+        this.output.output(message.getMessage());
+        this.output.prompt();
+    }
+
+    private void printError(Error message) {
+        this.output.output("ERROR: " + message.getErrorMessage());
+        this.output.prompt();
     }
 
     public String register(String[] params) throws ResponseException {
@@ -58,6 +134,7 @@ public class ChessClient {
                 params[2]
         ));
         state = State.LOGGED_IN;
+        currentUsername = response.username();
         return String.format("Successfully created user: %s", response.username());
     }
 
@@ -70,6 +147,7 @@ public class ChessClient {
                 params[1]
         ));
         state = State.LOGGED_IN;
+        currentUsername = response.username();
         return String.format("Successfully logged in as %s", response.username());
     }
 
@@ -77,6 +155,7 @@ public class ChessClient {
         assertLoggedIn();
         serverFacade.logout();
         state = State.LOGGED_OUT;
+        currentUsername = null;
         return "Successfully logged out";
     }
 
@@ -108,10 +187,11 @@ public class ChessClient {
         ));
         ChessBoard board = new ChessBoard();
         board.resetBoard();
-        return String.format("Successfully joined game %d\n%s\n\n%s\n", gameID,
-                stringBoard(board, false),
-                stringBoard(board, true)
-        );
+//        return String.format("Successfully joined game %d\n%s\n\n%s\n", gameID,
+//                stringBoard(board, false),
+//                stringBoard(board, true)
+//        );
+        return String.format("Successfully joined game %d as %s\n", gameID, params[1].toUpperCase());
     }
 
     public String list() throws ResponseException {
