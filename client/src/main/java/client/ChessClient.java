@@ -1,9 +1,7 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+import chess.dataModel.GameData;
 import chess.dataModel.request.*;
 import chess.dataModel.response.*;
 import client.exception.ResponseException;
@@ -13,6 +11,7 @@ import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
+import webSocketMessages.userCommands.MakeMove;
 
 import javax.websocket.DeploymentException;
 import javax.websocket.MessageHandler;
@@ -20,6 +19,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static client.ui.EscapeSequences.*;
 
@@ -28,6 +29,7 @@ public class ChessClient implements MessageHandler.Whole<String> {
     ClientOutput output;
     private State state = State.LOGGED_OUT;
     private String currentUsername = null;
+    private GameData latestGame = null;
     private boolean unicodePrint = true;
 
     public ChessClient(String domainName, ClientOutput output) {
@@ -83,6 +85,24 @@ public class ChessClient implements MessageHandler.Whole<String> {
                     this.output.output("OK");
                     break;
                 }
+                case "redraw": {
+                    this.output.output(redraw());
+                    this.output.prompt();
+                    break;
+                }
+                case "move": {
+                    move(params);
+                    break;
+                }
+                case "highlight": {
+                    break;
+                }
+                case "leave": {
+                    break;
+                }
+                case "resign": {
+                    break;
+                }
                 default: {
                     this.output.output(help());
                     this.output.prompt();
@@ -100,9 +120,20 @@ public class ChessClient implements MessageHandler.Whole<String> {
     public void onMessage(String s) {
         ServerMessage message = new Gson().fromJson(s, ServerMessage.class);
         switch (message.getServerMessageType()) {
-            case LOAD_GAME -> printGame(new Gson().fromJson(s, LoadGame.class));
-            case NOTIFICATION -> printNotification(new Gson().fromJson(s, Notification.class));
-            case ERROR -> printError(new Gson().fromJson(s, Error.class));
+            case LOAD_GAME: {
+                LoadGame loadGame = new Gson().fromJson(s, LoadGame.class);
+                printGame(loadGame);
+                latestGame = loadGame.getGame();
+                break;
+            }
+            case NOTIFICATION: {
+                printNotification(new Gson().fromJson(s, Notification.class));
+                break;
+            }
+            case ERROR: {
+                printError(new Gson().fromJson(s, Error.class));
+                break;
+            }
         }
     }
 
@@ -124,7 +155,7 @@ public class ChessClient implements MessageHandler.Whole<String> {
         this.output.prompt();
     }
 
-    public String register(String[] params) throws ResponseException {
+    private String register(String[] params) throws ResponseException {
         if (params.length != 3) {
             throw new ResponseException(400, "Expected: <USERNAME> <PASSWORD> <EMAIL>");
         }
@@ -138,7 +169,7 @@ public class ChessClient implements MessageHandler.Whole<String> {
         return String.format("Successfully created user: %s", response.username());
     }
 
-    public String login(String[] params) throws ResponseException {
+    private String login(String[] params) throws ResponseException {
         if (params.length != 2) {
             throw new ResponseException(400, "Expected: <USERNAME> <PASSWORD>");
         }
@@ -151,7 +182,7 @@ public class ChessClient implements MessageHandler.Whole<String> {
         return String.format("Successfully logged in as %s", response.username());
     }
 
-    public String logout() throws ResponseException {
+    private String logout() throws ResponseException {
         assertLoggedIn();
         serverFacade.logout();
         state = State.LOGGED_OUT;
@@ -159,7 +190,7 @@ public class ChessClient implements MessageHandler.Whole<String> {
         return "Successfully logged out";
     }
 
-    public String create(String[] params) throws ResponseException {
+    private String create(String[] params) throws ResponseException {
         assertLoggedIn();
         if (params.length != 1) {
             throw new ResponseException(400, "Expected: <NAME>");
@@ -170,7 +201,7 @@ public class ChessClient implements MessageHandler.Whole<String> {
         return String.format("Successfully created game with ID: %d", response.gameID());
     }
 
-    public String join(String[] params) throws ResponseException {
+    private String join(String[] params) throws ResponseException {
         assertLoggedIn();
         if (params.length != 2) {
             throw new ResponseException(400, "Expected: <ID> [WHITE|BLANK|<empty>]");
@@ -189,13 +220,13 @@ public class ChessClient implements MessageHandler.Whole<String> {
         return String.format("Successfully joined game %d as %s\n", gameID, params[1].toUpperCase());
     }
 
-    public String list() throws ResponseException {
+    private String list() throws ResponseException {
         assertLoggedIn();
         ListGamesResponse response = serverFacade.listGames();
         return response.toString();
     }
 
-    public String observe(String[] params) throws ResponseException {
+    private String observe(String[] params) throws ResponseException {
         assertLoggedIn();
         if (params.length != 1) {
             throw new ResponseException(400, "Expected: <ID>");
@@ -207,6 +238,34 @@ public class ChessClient implements MessageHandler.Whole<String> {
                 stringBoard(board, true)
         );
     }
+
+    private String redraw() throws ResponseException {
+        assertPlaying();
+        return stringBoard(
+                latestGame.game().getBoard(),
+                Objects.equals(currentUsername, latestGame.blackUsername())
+        );
+    }
+
+    private void move(String[] params) throws ResponseException {
+        assertPlaying();
+        String regex = "^([a-h])([1-8])$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcherStartPos = pattern.matcher(params[0].toLowerCase());
+        Matcher matcherEndPos = pattern.matcher(params[1].toLowerCase());
+
+        if (matcherStartPos.find() && matcherEndPos.find()) {
+            ChessMove move = new ChessMove(
+                    new ChessPosition(Integer.parseInt(matcherStartPos.group(2)), matcherStartPos.group(1).charAt(0) - 'a' + 1),
+                    new ChessPosition(Integer.parseInt(matcherEndPos.group(2)), matcherEndPos.group(1).charAt(0) - 'a' + 1),
+                    null
+            );
+            serverFacade.move(latestGame.gameID(), move);
+        } else {
+            throw new ResponseException(400, "Expected: <start_position> <end_position>");
+        }
+    }
+
 
     public String help() {
         if (state == State.LOGGED_OUT) {
@@ -255,6 +314,12 @@ public class ChessClient implements MessageHandler.Whole<String> {
     private void assertLoggedIn() throws ResponseException {
         if (state != State.LOGGED_IN) {
             throw new ResponseException(400, "Unauthorized");
+        }
+    }
+
+    private void assertPlaying() throws ResponseException {
+        if (state != State.PLAYING) {
+            throw new ResponseException(400, "You are not in a game");
         }
     }
 

@@ -3,6 +3,7 @@ package client.webSocket;
 import client.exception.ResponseException;
 import com.google.gson.Gson;
 import webSocketMessages.userCommands.JoinPlayer;
+import webSocketMessages.userCommands.MakeMove;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -28,9 +29,17 @@ public class WebSocketCommunicator extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void joinPlayer(JoinPlayer command) throws ResponseException {
+    public void joinPlayer(JoinPlayer message) throws ResponseException {
         try {
-            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+            this.session.getBasicRemote().sendText(new Gson().toJson(message));
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
+
+    public void move(MakeMove message) throws ResponseException {
+        try {
+            this.session.getBasicRemote().sendText(new Gson().toJson(message));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
