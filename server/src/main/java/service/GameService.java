@@ -28,8 +28,8 @@ public class GameService extends Service {
                 null,
                 null,
                 createGameRequest.gameName(),
-                new ChessGame()
-        );
+                new ChessGame(),
+                false);
         // Insert into database
         newGame = db.insertGame(newGame);
 
@@ -57,8 +57,8 @@ public class GameService extends Service {
                     auth.username(),
                     gameData.blackUsername(),
                     gameData.gameName(),
-                    new ChessGame(gameData.game())
-            );
+                    new ChessGame(gameData.game()),
+                    false);
         } else if (joinGameRequest.playerColor() != null && Objects.equals(joinGameRequest.playerColor().toUpperCase(), "BLACK")) {
             if (gameData.blackUsername() != null) {
                 throw new ServiceException(403, "Error: already taken");
@@ -68,8 +68,8 @@ public class GameService extends Service {
                     gameData.whiteUsername(),
                     auth.username(),
                     gameData.gameName(),
-                    new ChessGame(gameData.game())
-            );
+                    new ChessGame(gameData.game()),
+                    false);
         } else {
             // User is an observer, add functionality in phase 6
             updatedGame = gameData;

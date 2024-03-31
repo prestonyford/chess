@@ -250,15 +250,15 @@ public class ServerFacadeTests {
                         "Ponyo",
                         null,
                         "New Game",
-                        new ChessGame()
-                ),
+                        new ChessGame(),
+                        false),
                 new GameData(
                         game2Response.gameID(),
                         null,
                         "Ponyo",
                         "New Game2",
-                        new ChessGame()
-                )
+                        new ChessGame(),
+                        false)
         };
         Assertions.assertIterableEquals(Set.of(expected), Set.of(listGamesResponse.games()));
         // Assertions.assertArrayEquals(expected, listGamesResponse.games());

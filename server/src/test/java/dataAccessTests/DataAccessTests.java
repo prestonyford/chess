@@ -194,22 +194,22 @@ public class DataAccessTests {
                 "p1",
                 "p2",
                 "game1",
-                new ChessGame()
-        ));
+                new ChessGame(),
+                false));
         var game2 = dataAccess.insertGame(new GameData(
                 null,
                 "p1",
                 "p2",
                 "game2",
-                new ChessGame()
-        ));
+                new ChessGame(),
+                false));
         var game3 = dataAccess.insertGame(new GameData(
                 null,
                 "p1",
                 "p2",
                 "game3",
-                new ChessGame()
-        ));
+                new ChessGame(),
+                false));
 
         dataAccess.insertGame(game1);
         dataAccess.insertGame(game2);
@@ -228,15 +228,15 @@ public class DataAccessTests {
                 "p1",
                 "p2",
                 "sameName",
-                new ChessGame()
-        ));
+                new ChessGame(),
+                false));
         var game2 = dataAccess.insertGame(new GameData(
                 null,
                 "p1",
                 "p2",
                 "sameName",
-                new ChessGame()
-        ));
+                new ChessGame(),
+                false));
 
         dataAccess.insertGame(game1);
         dataAccess.insertGame(game2);
@@ -255,8 +255,8 @@ public class DataAccessTests {
                 "p1",
                 "p2",
                 "game1",
-                new ChessGame()
-        ));
+                new ChessGame(),
+                false));
         assertNotNull(game.gameID(), "gameID was still null after inserting to the database when it shouldn't have been");
         assertEquals(game, dataAccess.getGame(game.gameID()), "could not find game with gameID, or one was found but was not equal");
     }
@@ -272,22 +272,22 @@ public class DataAccessTests {
                 "p1",
                 "p2",
                 "game1",
-                new ChessGame()
-        ));
+                new ChessGame(),
+                false));
         var game2 = dataAccess.insertGame(new GameData(
                 game1.gameID(),
                 "p1",
                 "p2",
                 "game2",
-                new ChessGame()
-        ));
+                new ChessGame(),
+                false));
         assertEquals(new GameData(
                 game1.gameID(),
                 "p1",
                 "p2",
                 "game1",
-                new ChessGame()
-        ), game1);
+                new ChessGame(),
+                false), game1);
         assertNotEquals(game1.gameID(), game2.gameID());
     }
 
@@ -301,8 +301,8 @@ public class DataAccessTests {
                 "pl1",
                 "pl2",
                 "game1",
-                new ChessGame()
-        ));
+                new ChessGame(),
+                false));
         assertNotNull(game.gameID());
         assertEquals(game, dataAccess.getGame(game.gameID()));
     }
@@ -317,8 +317,8 @@ public class DataAccessTests {
                 "pl1",
                 "pl2",
                 "game1",
-                new ChessGame()
-        ));
+                new ChessGame(),
+                false));
         assertNotNull(game.gameID());
         assertNull(dataAccess.getGame(0));
     }
@@ -333,8 +333,8 @@ public class DataAccessTests {
                 null,
                 null,
                 "game1",
-                new ChessGame()
-        ));
+                new ChessGame(),
+                false));
 
         dataAccess.updateGame(
                 game.gameID(),
@@ -343,8 +343,8 @@ public class DataAccessTests {
                         "player1",
                         null,
                         "game1",
-                        new ChessGame()
-                )
+                        new ChessGame(),
+                        false)
         );
 
         assertEquals(
@@ -353,8 +353,8 @@ public class DataAccessTests {
                         "player1",
                         null,
                         "game1",
-                        new ChessGame()
-                ),
+                        new ChessGame(),
+                        false),
                 dataAccess.getGame(game.gameID()),
                 "Game was not updated correctly"
         );
@@ -370,8 +370,8 @@ public class DataAccessTests {
                 null,
                 null,
                 "game1",
-                new ChessGame()
-        ));
+                new ChessGame(),
+                false));
 
         dataAccess.updateGame(
                 -1,
@@ -380,8 +380,8 @@ public class DataAccessTests {
                         "player1",
                         null,
                         "game1",
-                        new ChessGame()
-                )
+                        new ChessGame(),
+                        false)
         );
 
         assertEquals(
@@ -390,8 +390,8 @@ public class DataAccessTests {
                         null,
                         null,
                         "game1",
-                        new ChessGame()
-                ),
+                        new ChessGame(),
+                        false),
                 game
         );
     }

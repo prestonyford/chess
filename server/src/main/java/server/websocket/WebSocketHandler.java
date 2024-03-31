@@ -10,7 +10,6 @@ import dataAccess.DataAccess;
 import dataAccess.DataAccessException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketException;
-import org.eclipse.jetty.websocket.api.WebSocketListener;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -19,8 +18,6 @@ import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.userCommands.*;
 
-import javax.sound.midi.SysexMessage;
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -143,8 +140,8 @@ public class WebSocketHandler {
                     Objects.equals(user.username(), game.whiteUsername()) ? null : game.whiteUsername(),
                     Objects.equals(user.username(), game.blackUsername()) ? null : game.blackUsername(),
                     game.gameName(),
-                    game.game()
-            );
+                    game.game(),
+                    false);
             db.updateGame(game.gameID(), updatedGame);
             gameRooms.get(message.getGameID()).remove(connection.visitorName);
             gameRooms.get(message.getGameID()).broadcast(connection.visitorName, new Notification(

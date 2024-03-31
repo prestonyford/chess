@@ -7,8 +7,8 @@ public record GameData(
         String whiteUsername,
         String blackUsername,
         String gameName,
-        ChessGame game
-) {
+        ChessGame game,
+        boolean concluded) {
     @Override
     public String toString() {
         return String.format(

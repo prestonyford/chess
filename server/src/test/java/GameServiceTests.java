@@ -9,7 +9,6 @@ import chess.dataModel.response.RegisterResponse;
 import dataAccess.DataAccess;
 import dataAccess.DataAccessException;
 import dataAccess.MemoryDataAccess;
-import dataAccess.SQLDataAccess;
 import org.junit.jupiter.api.*;
 import passoffTests.testClasses.TestException;
 import service.GameService;
@@ -124,8 +123,8 @@ public class GameServiceTests {
                             "Steve",
                             null,
                             "gameA",
-                            new ChessGame()
-                    )},
+                            new ChessGame(),
+                            false)},
                     listGamesResponse.games(),
                     "listGames returned something unexpected"
             );

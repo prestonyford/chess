@@ -79,8 +79,8 @@ public class MemoryDataAccess implements DataAccess {
                 gameData.whiteUsername(),
                 gameData.blackUsername(),
                 gameData.gameName(),
-                gameData.game()
-        );
+                gameData.game(),
+                false);
         games.add(gameData);
         return gameData;
     }
@@ -108,8 +108,8 @@ public class MemoryDataAccess implements DataAccess {
                 gameData.whiteUsername(),
                 gameData.blackUsername(),
                 gameData.gameName(),
-                gameData.game()
-        ));
+                gameData.game(),
+                false));
     }
 
     @Override

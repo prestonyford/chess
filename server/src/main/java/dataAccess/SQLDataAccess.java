@@ -8,7 +8,6 @@ import com.google.gson.Gson;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -40,7 +39,6 @@ public class SQLDataAccess implements DataAccess {
                     whiteUsername varchar(256),
                     blackUsername varchar(256),
                     game longtext NOT NULL,
-                    concluded boolean DEFAULT FALSE,
                     PRIMARY KEY (gameID)
                 );
                 """;
@@ -143,8 +141,8 @@ public class SQLDataAccess implements DataAccess {
                                 rs.getString("whiteUsername"),
                                 rs.getString("blackUsername"),
                                 rs.getString("gameName"),
-                                new Gson().fromJson(rs.getString("game"), ChessGame.class)
-                        ));
+                                new Gson().fromJson(rs.getString("game"), ChessGame.class),
+                                false));
                     }
                 }
             }
@@ -164,8 +162,8 @@ public class SQLDataAccess implements DataAccess {
                 gameData.whiteUsername(),
                 gameData.blackUsername(),
                 gameData.gameName(),
-                gameData.game()
-        );
+                gameData.game(),
+                false);
     }
 
     @Override
@@ -181,8 +179,8 @@ public class SQLDataAccess implements DataAccess {
                                 rs.getString("whiteUsername"),
                                 rs.getString("blackUsername"),
                                 rs.getString("gameName"),
-                                new Gson().fromJson(rs.getString("game"), ChessGame.class)
-                        );
+                                new Gson().fromJson(rs.getString("game"), ChessGame.class),
+                                false);
                     } else {
                         return null;
                     }
