@@ -185,12 +185,7 @@ public class ChessClient implements MessageHandler.Whole<String> {
                 params[1],
                 gameID
         ));
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
-//        return String.format("Successfully joined game %d\n%s\n\n%s\n", gameID,
-//                stringBoard(board, false),
-//                stringBoard(board, true)
-//        );
+        state = State.PLAYING;
         return String.format("Successfully joined game %d as %s\n", gameID, params[1].toUpperCase());
     }
 
@@ -221,14 +216,23 @@ public class ChessClient implements MessageHandler.Whole<String> {
                     unicode [TRUE|FALSE] - print with unicode if true or regular characters if false
                     quit - exit the application
                     help - what you're looking at now""";
+        } else if (state == State.LOGGED_IN) {
+            return """
+                    create <NAME> - create a game with the given name
+                    list - list games
+                    join <ID> [WHITE|BLANK] - join a game
+                    observe <ID> - spectate a game
+                    logout - logout
+                    unicode [TRUE|FALSE] - print with unicode if true or regular characters if false
+                    help - what you're looking at now""";
         }
         return """
-                create <NAME> - create a game with the given name
-                list - list games
-                join <ID> [WHITE|BLANK] - join a game
-                observe <ID> - spectate a game
-                logout - logout
+                redraw - redraw the chess board
+                move <start_position> <end_position> - make a move (i.e. move C2 C4)
+                highlight <position> - show the valid moves of the piece at the given position (i.e. highlight C4)
                 unicode [TRUE|FALSE] - print with unicode if true or regular characters if false
+                leave - leave the game
+                resign - forfeit the game
                 help - what you're looking at now""";
     }
 
