@@ -207,11 +207,9 @@ public class ChessGame {
         ChessPiece piece = chessBoard.getPiece(startPosition);
         Collection<ChessMove> moves = validMoves(startPosition);
 
-        if (
-                moves == null ||
-                        !moves.contains(move) ||
-                        piece.getTeamColor() != teamTurn
-        ) {
+        if (piece.getTeamColor() != teamTurn) {
+            throw new InvalidMoveException("It is not your turn");
+        } else if (moves == null || !moves.contains(move)) {
             throw new InvalidMoveException("Invalid move");
         }
 

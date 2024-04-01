@@ -44,49 +44,49 @@ public class ChessClient implements MessageHandler.Whole<String> {
         try {
             switch (cmd) {
                 case "register": {
-                    this.output.output(register(params));
+                    this.output.output(register(params) + '\n');
                     this.output.prompt();
                     break;
                 }
                 case "login": {
-                    this.output.output(login(params));
+                    this.output.output(login(params) + '\n');
                     this.output.prompt();
                     break;
                 }
                 case "create": {
-                    this.output.output(create(params));
+                    this.output.output(create(params) + '\n');
                     this.output.prompt();
                     break;
                 }
                 case "list": {
-                    this.output.output(list());
+                    this.output.output(list() + '\n');
                     this.output.prompt();
                     break;
                 }
                 case "join": {
-                    this.output.output(join(params));
+                    this.output.output(join(params) + '\n');
                     break;
                 }
                 case "observe": {
-                    this.output.output(observe(params));
+                    this.output.output(observe(params) + '\n');
                     break;
                 }
                 case "unicode": {
-                    this.output.output(setUnicodePrint(params));
+                    this.output.output(setUnicodePrint(params) + '\n');
                     this.output.prompt();
                     break;
                 }
                 case "logout": {
-                    this.output.output(logout());
+                    this.output.output(logout() + '\n');
                     this.output.prompt();
                     break;
                 }
                 case "quit": {
-                    this.output.output("OK");
+                    this.output.output("OK" + '\n');
                     break;
                 }
                 case "redraw": {
-                    this.output.output(redraw());
+                    this.output.output(redraw() + '\n');
                     this.output.prompt();
                     break;
                 }
@@ -104,14 +104,14 @@ public class ChessClient implements MessageHandler.Whole<String> {
                     break;
                 }
                 default: {
-                    this.output.output(help());
+                    this.output.output(help() + '\n');
                     this.output.prompt();
                     break;
                 }
             }
             ;
         } catch (ResponseException e) {
-            this.output.output(e.getMessage());
+            this.output.output(e.getMessage() + '\n');
             this.output.prompt();
         }
     }
@@ -138,20 +138,20 @@ public class ChessClient implements MessageHandler.Whole<String> {
     }
 
     private void printGame(LoadGame message) {
-        this.output.output(stringBoard(
+        this.output.output('\r' + stringBoard(
                 message.getGame().game().getBoard(),
                 Objects.equals(currentUsername, message.getGame().blackUsername())
-        ));
+        ) + '\n');
         this.output.prompt();
     }
 
     private void printNotification(Notification message) {
-        this.output.output(message.getMessage());
+        this.output.output(SET_TEXT_COLOR_BLUE + '\r' + message.getMessage());
         this.output.prompt();
     }
 
     private void printError(Error message) {
-        this.output.output("ERROR: " + message.getErrorMessage());
+        this.output.output("ERROR: " + message.getErrorMessage() + '\n');
         this.output.prompt();
     }
 

@@ -41,6 +41,6 @@ public class Repl implements ClientOutput {
 
     @Override
     public void output(String message) {
-        System.out.println(message);
+        System.out.print(message);
     }
 }
