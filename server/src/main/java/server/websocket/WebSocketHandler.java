@@ -58,23 +58,23 @@ public class WebSocketHandler {
         UserGameCommand command = new Gson().fromJson(s, UserGameCommand.class);
         AuthData user = db.getAuth(command.getAuthString());
         Connection connection = new Connection(user.username(), session);
-        switch (command.getCommandType()) {
-            case JOIN_PLAYER -> joinPlayer(connection, new Gson().fromJson(s, JoinPlayer.class));
-            case JOIN_OBSERVER -> joinObserver(connection, new Gson().fromJson(s, JoinObserver.class));
-            case MAKE_MOVE -> makeMove(connection, new Gson().fromJson(s, MakeMove.class));
-            case LEAVE -> leave(connection, new Gson().fromJson(s, Leave.class));
-            case RESIGN -> resign(connection, new Gson().fromJson(s, Resign.class));
+        try {
+            switch (command.getCommandType()) {
+                case JOIN_PLAYER -> joinPlayer(connection, new Gson().fromJson(s, JoinPlayer.class));
+                case JOIN_OBSERVER -> joinObserver(connection, new Gson().fromJson(s, JoinObserver.class));
+                case MAKE_MOVE -> makeMove(connection, new Gson().fromJson(s, MakeMove.class));
+                case LEAVE -> leave(connection, new Gson().fromJson(s, Leave.class));
+                case RESIGN -> resign(connection, new Gson().fromJson(s, Resign.class));
+            }
+        } catch (WebSocketException error) {
+            System.out.println(error.getMessage());
+            session.getRemote().sendString(
+                    new Gson().toJson(new Error(
+                            error.getMessage()
+                    ))
+            );
         }
-    }
 
-    @OnWebSocketError
-    public void onError(Session session, Throwable error) throws IOException {
-        System.out.println(error.getMessage());
-        session.getRemote().sendString(
-                new Gson().toJson(new Error(
-                        error.getMessage()
-                ))
-        );
     }
 
     private void joinPlayer(Connection connection, JoinPlayer message) throws WebSocketException {
@@ -112,6 +112,10 @@ public class WebSocketHandler {
         try {
             GameData game = db.getGame(message.getGameID());
             ChessPiece piece = game.game().getBoard().getPiece(message.getMove().getStartPosition());
+
+            if (piece == null) {
+                throw new WebSocketException("There is no piece at the given position");
+            }
 
             assertAuthorizedGameUpdate(game, connection.visitorName,
                     piece.getTeamColor()
