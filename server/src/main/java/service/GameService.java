@@ -49,7 +49,7 @@ public class GameService extends Service {
         GameData updatedGame;
 
         if (joinGameRequest.playerColor() != null && Objects.equals(joinGameRequest.playerColor().toUpperCase(), "WHITE")) {
-            if (gameData.whiteUsername() != null) {
+            if (gameData.whiteUsername() != null && !Objects.equals(gameData.whiteUsername(), auth.username())) {
                 throw new ServiceException(403, "Error: already taken");
             }
             updatedGame = new GameData(
@@ -60,7 +60,7 @@ public class GameService extends Service {
                     new ChessGame(gameData.game()),
                     false);
         } else if (joinGameRequest.playerColor() != null && Objects.equals(joinGameRequest.playerColor().toUpperCase(), "BLACK")) {
-            if (gameData.blackUsername() != null) {
+            if (gameData.blackUsername() != null && !Objects.equals(gameData.blackUsername(), auth.username())) {
                 throw new ServiceException(403, "Error: already taken");
             }
             updatedGame = new GameData(
