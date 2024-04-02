@@ -242,7 +242,11 @@ public class ChessClient implements MessageHandler.Whole<String> {
     }
 
     private String redraw() throws ResponseException {
-        assertPlaying();
+        try {
+            assertPlaying();
+        } catch (ResponseException ignore) {
+            assertObserving();
+        }
         return stringBoard(
                 latestGame.game().getBoard(),
                 List.of(), Objects.equals(currentUsername, latestGame.blackUsername())
@@ -322,11 +326,10 @@ public class ChessClient implements MessageHandler.Whole<String> {
                     help - what you're looking at now""";
         }
         return """
-                    redraw - redraw the chess board
-                    highlight <position> - show the valid moves of the piece at the given position (i.e. highlight C4)
-                    leave - leave the game
-                    help - what you're looking at now
-                """;
+                redraw - redraw the chess board
+                highlight <position> - show the valid moves of the piece at the given position (i.e. highlight C4)
+                leave - leave the game
+                help - what you're looking at now""";
     }
 
     private String setUnicodePrint(String[] params) throws ResponseException {
@@ -334,10 +337,10 @@ public class ChessClient implements MessageHandler.Whole<String> {
             throw new ResponseException(400, "Expected: [TRUE|FALSE]");
         }
         String arg = params[0].toLowerCase();
-        if (arg.equals("true")) {
+        if (arg.equals("true") || arg.equals("on")) {
             unicodePrint = true;
             return "Unicode ENABLED";
-        } else if (arg.equals("false")) {
+        } else if (arg.equals("false") || arg.equals("off")) {
             unicodePrint = false;
             return "Unicode DISABLED";
         } else {
@@ -379,18 +382,18 @@ public class ChessClient implements MessageHandler.Whole<String> {
         int diff = invert ? -1 : 1;
 
         StringBuilder sb = new StringBuilder();
-        ChessGame.TeamColor tileColor = ChessGame.TeamColor.WHITE;
+        boolean tileAlternate = true;
         stringBuildBottomTop(sb, invert);
         sb.append(RESET_BG_COLOR + '\n');
         for (int row = up; (!invert && row >= down) || (invert && row <= down); row -= diff) {
-            tileColor = tileColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+            tileAlternate = !tileAlternate;
             stringBuildBorder(sb, (char) ('1' - 1 + row));
             for (int col = down; (!invert && col <= up) || (invert && col >= up); col += diff) {
-                tileColor = tileColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+                tileAlternate = !tileAlternate;
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                 ChessGame.TeamColor teamColor = piece == null ? null : piece.getTeamColor();
                 stringBuildTile(
-                        sb, tileColor, teamColor,
+                        sb, tileAlternate, teamColor,
                         piece == null ? null : piece.getPieceType(),
                         highlight.contains(new ChessPosition(row, col))
                 );
@@ -421,10 +424,10 @@ public class ChessClient implements MessageHandler.Whole<String> {
         sb.append("\u2005\u2005");
     }
 
-    private void stringBuildTile(StringBuilder sb, ChessGame.TeamColor tileColor, ChessGame.TeamColor teamColor, ChessPiece.PieceType piece, boolean highlight) {
+    private void stringBuildTile(StringBuilder sb, boolean tileAlternate, ChessGame.TeamColor teamColor, ChessPiece.PieceType piece, boolean highlight) {
         if (highlight) {
             sb.append(SET_BG_COLOR_GREEN);
-        } else if (tileColor == ChessGame.TeamColor.WHITE) {
+        } else if (tileAlternate) {
             sb.append(SET_BG_COLOR_BEIGE);
         } else {
             sb.append(SET_BG_COLOR_BROWN);
