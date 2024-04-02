@@ -11,13 +11,15 @@ import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
-import webSocketMessages.userCommands.JoinObserver;
 
 import javax.websocket.MessageHandler;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static client.ui.EscapeSequences.*;
 
@@ -139,7 +141,7 @@ public class ChessClient implements MessageHandler.Whole<String> {
     private void printGame(LoadGame message) {
         this.output.output('\r' + stringBoard(
                 message.getGame().game().getBoard(),
-                Objects.equals(currentUsername, message.getGame().blackUsername())
+                List.of(), Objects.equals(currentUsername, message.getGame().blackUsername())
         ) + '\n');
         this.output.prompt();
     }
@@ -238,7 +240,7 @@ public class ChessClient implements MessageHandler.Whole<String> {
         assertPlaying();
         return stringBoard(
                 latestGame.game().getBoard(),
-                Objects.equals(currentUsername, latestGame.blackUsername())
+                List.of(), Objects.equals(currentUsername, latestGame.blackUsername())
         );
     }
 
@@ -254,7 +256,11 @@ public class ChessClient implements MessageHandler.Whole<String> {
 
     private String highlight(String[] params) throws ResponseException {
         ChessPosition pos = getPositionFromInput(params[0]);
-        return "dunno how to do this yet";
+        return stringBoard(
+                latestGame.game().getBoard(),
+                latestGame.game().validMoves(pos).stream().map(ChessMove::getEndPosition).collect(Collectors.toList()),
+                Objects.equals(currentUsername, latestGame.blackUsername())
+        );
     }
 
     private String help() {
@@ -336,7 +342,7 @@ public class ChessClient implements MessageHandler.Whole<String> {
         }
     }
 
-    private String stringBoard(ChessBoard board, boolean invert) {
+    private String stringBoard(ChessBoard board, Collection<ChessPosition> highlight, boolean invert) {
         int up = invert ? 1 : 8;
         int down = invert ? 8 : 1;
         int diff = invert ? -1 : 1;
@@ -352,7 +358,11 @@ public class ChessClient implements MessageHandler.Whole<String> {
                 tileColor = tileColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                 ChessGame.TeamColor teamColor = piece == null ? null : piece.getTeamColor();
-                stringBuildTile(sb, tileColor, teamColor, piece == null ? null : piece.getPieceType());
+                stringBuildTile(
+                        sb, tileColor, teamColor,
+                        piece == null ? null : piece.getPieceType(),
+                        highlight.contains(new ChessPosition(row, col))
+                );
             }
             stringBuildBorder(sb, (char) ('1' - 1 + row));
             sb.append(RESET_BG_COLOR + "\n");
@@ -380,8 +390,10 @@ public class ChessClient implements MessageHandler.Whole<String> {
         sb.append("\u2005\u2005");
     }
 
-    private void stringBuildTile(StringBuilder sb, ChessGame.TeamColor tileColor, ChessGame.TeamColor teamColor, ChessPiece.PieceType piece) {
-        if (tileColor == ChessGame.TeamColor.WHITE) {
+    private void stringBuildTile(StringBuilder sb, ChessGame.TeamColor tileColor, ChessGame.TeamColor teamColor, ChessPiece.PieceType piece, boolean highlight) {
+        if (highlight) {
+            sb.append(SET_BG_COLOR_GREEN);
+        } else if (tileColor == ChessGame.TeamColor.WHITE) {
             sb.append(SET_BG_COLOR_BEIGE);
         } else {
             sb.append(SET_BG_COLOR_BROWN);
