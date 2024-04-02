@@ -128,6 +128,19 @@ public class WebSocketHandler {
             );
 
             game.game().makeMove(message.getMove());
+
+            // Conclude game if checkmate or stalemate
+            ChessGame.TeamColor opposingTeamColor = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+            if (game.game().isInStalemate(opposingTeamColor) || game.game().isInCheckmate(opposingTeamColor)) {
+                game = new GameData(
+                        game.gameID(),
+                        game.whiteUsername(),
+                        game.blackUsername(),
+                        game.gameName(),
+                        game.game(),
+                        true
+                );
+            }
             db.updateGame(game.gameID(), game);
             gameRooms.get(message.getGameID()).broadcast("", new LoadGame(game));
             gameRooms.get(message.getGameID()).broadcast(connection.visitorName, new Notification(
@@ -138,6 +151,11 @@ public class WebSocketHandler {
                             message.getMove().getEndPosition().toString()
                     )
             ));
+            if (game.concluded()) {
+                gameRooms.get(message.getGameID()).broadcast("", new Notification(
+                        String.format("%s (%s) has won the game!", connection.visitorName, piece.getTeamColor().name())
+                ));
+            }
         } catch (InvalidMoveException | IOException | DataAccessException ex) {
             throw new WebSocketException(ex.getMessage());
         }
@@ -170,10 +188,13 @@ public class WebSocketHandler {
         try {
             GameData game = db.getGame(message.getGameID());
             ChessGame.TeamColor teamColor;
+            String opponentName = "";
             if (Objects.equals(game.whiteUsername(), connection.visitorName)) {
                 teamColor = ChessGame.TeamColor.WHITE;
+                opponentName = game.blackUsername();
             } else if (Objects.equals(game.blackUsername(), connection.visitorName)) {
                 teamColor = ChessGame.TeamColor.BLACK;
+                opponentName = game.whiteUsername();
             } else {
                 teamColor = null;
             }
@@ -192,7 +213,10 @@ public class WebSocketHandler {
             );
             db.updateGame(game.gameID(), updatedGame);
             gameRooms.get(message.getGameID()).broadcast("", new Notification(
-                    connection.visitorName + " has resigned"
+                    String.format("%s has resigned.\n%s (%s) has won the game!",
+                            connection.visitorName,
+                            opponentName,
+                            (teamColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE).name())
             ));
         } catch (Exception ex) {
             throw new WebSocketException(ex.getMessage());

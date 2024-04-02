@@ -20,8 +20,8 @@ import javax.websocket.MessageHandler;
 public class ServerFacade {
     private final HttpCommunicator httpCommunicator;
     private WebSocketCommunicator webSocketCommunicator;
-    private String domainName;
-    private MessageHandler.Whole<String> wsMessageHandler;
+    private final String domainName;
+    private final MessageHandler.Whole<String> wsMessageHandler;
     private String authToken;
 
     public ServerFacade(String domainName, MessageHandler.Whole<String> wsMessageHandler) {
