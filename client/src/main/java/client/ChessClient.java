@@ -92,6 +92,8 @@ public class ChessClient implements MessageHandler.Whole<String> {
                     break;
                 }
                 case "highlight": {
+                    this.output.output(highlight(params) + '\n');
+                    this.output.prompt();
                     break;
                 }
                 case "leave": {
@@ -242,25 +244,20 @@ public class ChessClient implements MessageHandler.Whole<String> {
 
     private void move(String[] params) throws ResponseException {
         assertPlaying();
-        String regex = "^([a-h])([1-8])$";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcherStartPos = pattern.matcher(params[0].toLowerCase());
-        Matcher matcherEndPos = pattern.matcher(params[1].toLowerCase());
-
-        if (matcherStartPos.find() && matcherEndPos.find()) {
-            ChessMove move = new ChessMove(
-                    new ChessPosition(Integer.parseInt(matcherStartPos.group(2)), matcherStartPos.group(1).charAt(0) - 'a' + 1),
-                    new ChessPosition(Integer.parseInt(matcherEndPos.group(2)), matcherEndPos.group(1).charAt(0) - 'a' + 1),
-                    null
-            );
-            serverFacade.makeMove(latestGame.gameID(), move);
-        } else {
-            throw new ResponseException(400, "Expected: <start_position> <end_position>");
-        }
+        ChessMove move = new ChessMove(
+                getPositionFromInput(params[0]),
+                getPositionFromInput(params[1]),
+                null
+        );
+        serverFacade.makeMove(latestGame.gameID(), move);
     }
 
+    private String highlight(String[] params) throws ResponseException {
+        ChessPosition pos = getPositionFromInput(params[0]);
+        return "dunno how to do this yet";
+    }
 
-    public String help() {
+    private String help() {
         if (state == State.LOGGED_OUT) {
             return """
                     register <USERNAME> <PASSWORD> <EMAIL> - to create an account
@@ -277,18 +274,25 @@ public class ChessClient implements MessageHandler.Whole<String> {
                     logout - logout
                     unicode [TRUE|FALSE] - print with unicode if true or regular characters if false
                     help - what you're looking at now""";
+        } else if (state == State.PLAYING) {
+            return """
+                    redraw - redraw the chess board
+                    move <start_position> <end_position> - make a move (i.e. move C2 C4)
+                    highlight <position> - show the valid moves of the piece at the given position (i.e. highlight C4)
+                    unicode [TRUE|FALSE] - print with unicode if true or regular characters if false
+                    leave - leave the game
+                    resign - forfeit the game
+                    help - what you're looking at now""";
         }
         return """
-                redraw - redraw the chess board
-                move <start_position> <end_position> - make a move (i.e. move C2 C4)
-                highlight <position> - show the valid moves of the piece at the given position (i.e. highlight C4)
-                unicode [TRUE|FALSE] - print with unicode if true or regular characters if false
-                leave - leave the game
-                resign - forfeit the game
-                help - what you're looking at now""";
+                    redraw - redraw the chess board
+                    highlight <position> - show the valid moves of the piece at the given position (i.e. highlight C4)
+                    leave - leave the game
+                    help - what you're looking at now
+                """;
     }
 
-    public String setUnicodePrint(String[] params) throws ResponseException {
+    private String setUnicodePrint(String[] params) throws ResponseException {
         if (params.length != 1) {
             throw new ResponseException(400, "Expected: [TRUE|FALSE]");
         }
@@ -304,6 +308,16 @@ public class ChessClient implements MessageHandler.Whole<String> {
         }
     }
 
+    private ChessPosition getPositionFromInput(String input) throws ResponseException {
+        String regex = "^([a-h])([1-8])$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input.toLowerCase());
+        if (matcher.find()) {
+            return new ChessPosition(Integer.parseInt(matcher.group(2)), matcher.group(1).charAt(0) - 'a' + 1);
+        }
+        throw new ResponseException(400, "Expected: <start_position> <end_position>");
+    }
+
     private void assertLoggedIn() throws ResponseException {
         if (state != State.LOGGED_IN) {
             throw new ResponseException(400, "Unauthorized");
@@ -312,13 +326,13 @@ public class ChessClient implements MessageHandler.Whole<String> {
 
     private void assertPlaying() throws ResponseException {
         if (state != State.PLAYING) {
-            throw new ResponseException(400, "You are not in a game");
+            throw new ResponseException(400, "You are not playing a game");
         }
     }
 
     private void assertObserving() throws ResponseException {
         if (state != State.OBSERVING) {
-            throw new ResponseException(400, "You are not in a game");
+            throw new ResponseException(400, "You are not observing a game");
         }
     }
 

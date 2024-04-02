@@ -23,10 +23,9 @@ public class Repl implements ClientOutput {
 
     public void run() {
         System.out.println("♕ Welcome to CS 240 Chess Client ♕" + SET_TEXT_COLOR_BLUE);
-        System.out.println(client.help());
+        client.eval("help");
         Scanner scanner = new Scanner(System.in);
         String line = "";
-        prompt();
         while (!line.equals("quit")) {
             line = scanner.nextLine();
             System.out.print(SET_TEXT_COLOR_BLUE);
