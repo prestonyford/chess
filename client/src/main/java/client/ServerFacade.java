@@ -13,10 +13,10 @@ import chess.dataModel.response.RegisterResponse;
 import client.http.HttpCommunicator;
 import client.exception.ResponseException;
 import client.webSocket.WebSocketCommunicator;
+import webSocketMessages.userCommands.JoinObserver;
 import webSocketMessages.userCommands.JoinPlayer;
 import webSocketMessages.userCommands.MakeMove;
 
-import javax.sound.midi.SysexMessage;
 import javax.websocket.MessageHandler;
 
 public class ServerFacade {
@@ -45,6 +45,7 @@ public class ServerFacade {
     public LoginResponse login(LoginRequest request) throws ResponseException {
         LoginResponse response = httpCommunicator.login(request);
         authToken = response.authToken();
+        webSocketCommunicator = new WebSocketCommunicator(domainName, wsMessageHandler);
         return response;
     }
 
@@ -59,8 +60,7 @@ public class ServerFacade {
 
     public void joinGame(JoinGameRequest request) throws ResponseException {
         httpCommunicator.joinGame(request, authToken);
-        webSocketCommunicator = new WebSocketCommunicator(domainName, wsMessageHandler);
-        webSocketCommunicator.joinPlayer(new JoinPlayer(
+        webSocketCommunicator.sendMessage(new JoinPlayer(
                 authToken,
                 request.gameID(),
                 // TODO: Refactor to use enums instead of strings in JoinGameRequest and similar
@@ -68,11 +68,18 @@ public class ServerFacade {
         ));
     }
 
-    public void move(int gameID, ChessMove move) throws ResponseException {
+    public void makeMove(int gameID, ChessMove move) throws ResponseException {
         MakeMove message = new MakeMove(
                 authToken, gameID, move
         );
-        webSocketCommunicator.move(message);
+        webSocketCommunicator.sendMessage(message);
+    }
+
+    public void observeGame(int gameID) throws ResponseException {
+        webSocketCommunicator.sendMessage(new JoinObserver(
+                authToken,
+                gameID
+        ));
     }
 
     public ListGamesResponse listGames() throws ResponseException {

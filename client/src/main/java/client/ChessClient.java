@@ -11,12 +11,9 @@ import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
-import webSocketMessages.userCommands.MakeMove;
+import webSocketMessages.userCommands.JoinObserver;
 
-import javax.websocket.DeploymentException;
 import javax.websocket.MessageHandler;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -227,16 +224,12 @@ public class ChessClient implements MessageHandler.Whole<String> {
     }
 
     private String observe(String[] params) throws ResponseException {
-        assertLoggedIn();
+        assertObserving();
         if (params.length != 1) {
             throw new ResponseException(400, "Expected: <ID>");
         }
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
-        return String.format("Successfully joined game %s\n%s\n\n%s\n", params[0],
-                stringBoard(board, false),
-                stringBoard(board, true)
-        );
+        serverFacade.observeGame(Integer.parseInt(params[0]));
+        return String.format("Observing game %s\n", params[0]);
     }
 
     private String redraw() throws ResponseException {
@@ -260,7 +253,7 @@ public class ChessClient implements MessageHandler.Whole<String> {
                     new ChessPosition(Integer.parseInt(matcherEndPos.group(2)), matcherEndPos.group(1).charAt(0) - 'a' + 1),
                     null
             );
-            serverFacade.move(latestGame.gameID(), move);
+            serverFacade.makeMove(latestGame.gameID(), move);
         } else {
             throw new ResponseException(400, "Expected: <start_position> <end_position>");
         }
@@ -319,6 +312,12 @@ public class ChessClient implements MessageHandler.Whole<String> {
 
     private void assertPlaying() throws ResponseException {
         if (state != State.PLAYING) {
+            throw new ResponseException(400, "You are not in a game");
+        }
+    }
+
+    private void assertObserving() throws ResponseException {
+        if (state != State.OBSERVING) {
             throw new ResponseException(400, "You are not in a game");
         }
     }
