@@ -63,7 +63,6 @@ public class ServerFacade {
         webSocketCommunicator.sendMessage(new JoinPlayer(
                 authToken,
                 request.gameID(),
-                // TODO: Refactor to use enums instead of strings in JoinGameRequest and similar
                 request.playerColor().equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK
         ));
     }
