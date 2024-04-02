@@ -7,6 +7,7 @@ import chess.dataModel.response.*;
 import client.exception.ResponseException;
 import client.ui.PrintConfig;
 import com.google.gson.Gson;
+import org.glassfish.tyrus.core.WebSocketException;
 import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
@@ -99,9 +100,12 @@ public class ChessClient implements MessageHandler.Whole<String> {
                     break;
                 }
                 case "leave": {
+                    this.output.output(leave() + '\n');
+                    this.output.prompt();
                     break;
                 }
                 case "resign": {
+                    resign();
                     break;
                 }
                 default: {
@@ -256,11 +260,28 @@ public class ChessClient implements MessageHandler.Whole<String> {
 
     private String highlight(String[] params) throws ResponseException {
         ChessPosition pos = getPositionFromInput(params[0]);
+        Collection<ChessMove> moves = latestGame.game().validMoves(pos);
         return stringBoard(
                 latestGame.game().getBoard(),
-                latestGame.game().validMoves(pos).stream().map(ChessMove::getEndPosition).collect(Collectors.toList()),
+                moves == null ? List.of() : moves.stream().map(ChessMove::getEndPosition).collect(Collectors.toList()),
                 Objects.equals(currentUsername, latestGame.blackUsername())
         );
+    }
+
+    private String leave() throws ResponseException {
+        try {
+            assertPlaying();
+        } catch (WebSocketException ignore) {
+            assertObserving();
+        }
+        serverFacade.leaveGame(latestGame.gameID());
+        state = State.LOGGED_IN;
+        return String.format("Left game %d", latestGame.gameID());
+    }
+
+    private void resign() throws ResponseException {
+        assertPlaying();
+        serverFacade.resign(latestGame.gameID());
     }
 
     private String help() {

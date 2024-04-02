@@ -13,9 +13,7 @@ import chess.dataModel.response.RegisterResponse;
 import client.http.HttpCommunicator;
 import client.exception.ResponseException;
 import client.webSocket.WebSocketCommunicator;
-import webSocketMessages.userCommands.JoinObserver;
-import webSocketMessages.userCommands.JoinPlayer;
-import webSocketMessages.userCommands.MakeMove;
+import webSocketMessages.userCommands.*;
 
 import javax.websocket.MessageHandler;
 
@@ -68,6 +66,10 @@ public class ServerFacade {
         ));
     }
 
+    public ListGamesResponse listGames() throws ResponseException {
+        return httpCommunicator.listGames(authToken);
+    }
+
     public void makeMove(int gameID, ChessMove move) throws ResponseException {
         MakeMove message = new MakeMove(
                 authToken, gameID, move
@@ -82,7 +84,17 @@ public class ServerFacade {
         ));
     }
 
-    public ListGamesResponse listGames() throws ResponseException {
-        return httpCommunicator.listGames(authToken);
+    public void leaveGame(int gameID) throws ResponseException {
+        webSocketCommunicator.sendMessage(new Leave(
+                authToken,
+                gameID
+        ));
+    }
+
+    public void resign(int gameID) throws ResponseException {
+        webSocketCommunicator.sendMessage(new Resign(
+                authToken,
+                gameID
+        ));
     }
 }
