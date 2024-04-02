@@ -37,6 +37,7 @@ public class ServerFacade {
     public RegisterResponse register(RegisterRequest request) throws ResponseException {
         RegisterResponse response = httpCommunicator.register(request);
         authToken = response.authToken();
+        webSocketCommunicator = new WebSocketCommunicator(domainName, wsMessageHandler);
         return response;
     }
 
@@ -49,6 +50,7 @@ public class ServerFacade {
 
     public void logout() throws ResponseException {
         httpCommunicator.logout(authToken);
+        webSocketCommunicator = null;
         authToken = null;
     }
 

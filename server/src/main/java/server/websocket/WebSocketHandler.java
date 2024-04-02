@@ -57,8 +57,11 @@ public class WebSocketHandler {
     public void onMessage(Session session, String s) throws DataAccessException, IOException {
         UserGameCommand command = new Gson().fromJson(s, UserGameCommand.class);
         AuthData user = db.getAuth(command.getAuthString());
-        Connection connection = new Connection(user.username(), session);
         try {
+            if (user == null) {
+                throw new WebSocketException("Unauthorized");
+            }
+            Connection connection = new Connection(user.username(), session);
             switch (command.getCommandType()) {
                 case JOIN_PLAYER -> joinPlayer(connection, new Gson().fromJson(s, JoinPlayer.class));
                 case JOIN_OBSERVER -> joinObserver(connection, new Gson().fromJson(s, JoinObserver.class));
@@ -80,6 +83,9 @@ public class WebSocketHandler {
     private void joinPlayer(Connection connection, JoinPlayer message) throws WebSocketException {
         try {
             GameData game = db.getGame(message.getGameID());
+            if (game == null) {
+                throw new WebSocketException("Game does not exist");
+            }
             assertAuthorizedGameUpdate(game, connection.visitorName, message.getPlayerColor());
 
             addConnectionToRoom(message.getGameID(), connection);
