@@ -232,11 +232,12 @@ public class ChessClient implements MessageHandler.Whole<String> {
     }
 
     private String observe(String[] params) throws ResponseException {
-        assertObserving();
+        assertLoggedIn();
         if (params.length != 1) {
             throw new ResponseException(400, "Expected: <ID>");
         }
         serverFacade.observeGame(Integer.parseInt(params[0]));
+        state = State.OBSERVING;
         return String.format("Observing game %s\n", params[0]);
     }
 
@@ -250,10 +251,19 @@ public class ChessClient implements MessageHandler.Whole<String> {
 
     private void move(String[] params) throws ResponseException {
         assertPlaying();
+        if (params.length < 2 || params.length > 3) {
+            throw new ResponseException(400, "Expected: <START_POSITION> <END_POSITION> [QUEEN|ROOK|BISHOP|KNIGHT|blank]");
+        }
         ChessMove move = new ChessMove(
                 getPositionFromInput(params[0]),
                 getPositionFromInput(params[1]),
-                null
+                params.length < 3 ? null : switch (params[2].toLowerCase()) {
+                    case "queen" -> ChessPiece.PieceType.QUEEN;
+                    case "rook" -> ChessPiece.PieceType.ROOK;
+                    case "bishop" -> ChessPiece.PieceType.BISHOP;
+                    case "pawn" -> ChessPiece.PieceType.PAWN;
+                    default -> null;
+                }
         );
         serverFacade.makeMove(latestGame.gameID(), move);
     }
@@ -271,7 +281,7 @@ public class ChessClient implements MessageHandler.Whole<String> {
     private String leave() throws ResponseException {
         try {
             assertPlaying();
-        } catch (WebSocketException ignore) {
+        } catch (ResponseException ignore) {
             assertObserving();
         }
         serverFacade.leaveGame(latestGame.gameID());
@@ -304,7 +314,7 @@ public class ChessClient implements MessageHandler.Whole<String> {
         } else if (state == State.PLAYING) {
             return """
                     redraw - redraw the chess board
-                    move <start_position> <end_position> - make a move (i.e. move C2 C4)
+                    move <START_POSITION> <END_POSITION> [QUEEN|ROOK|BISHOP|KNIGHT|blank] - make a move (i.e. move C2 C4). Include the promotion piece as an argument when necessary.
                     highlight <position> - show the valid moves of the piece at the given position (i.e. highlight C4)
                     unicode [TRUE|FALSE] - print with unicode if true or regular characters if false
                     leave - leave the game
