@@ -241,7 +241,7 @@ public class ChessGame {
                     blackRightRookHasMoved = true;
                     ChessPosition rookPos = new ChessPosition(8, 8);
                     chessBoard.movePiece(new ChessMove(rookPos, new ChessPosition(8, 6), null));
-                } else if (piece.getTeamColor() == TeamColor.BLACK) {
+                } else if (endPosition.getColumn() - startPosition.getColumn() == -2) {
                     blackLeftRookHasMoved = true;
                     ChessPosition rookPos = new ChessPosition(8, 1);
                     chessBoard.movePiece(new ChessMove(rookPos, new ChessPosition(8, 4), null));
