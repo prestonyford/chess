@@ -8,6 +8,6 @@ import java.util.stream.Collectors;
 public record ListGamesResponse(GameData[] games) {
     @Override
     public String toString() {
-        return Arrays.stream(games).map(GameData::toString).collect(Collectors.joining("\n-====================-\n"));
+        return Arrays.stream(games).map(GameData::toString).collect(Collectors.joining("\n======================\n"));
     }
 }

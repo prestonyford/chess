@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -131,7 +132,7 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
-        HashSet<GameData> games = new HashSet<>();
+        ArrayList<GameData> games = new ArrayList<>();
         try (var conn = DatabaseManager.getConnection()) {
             String statement = "SELECT * FROM games;";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {

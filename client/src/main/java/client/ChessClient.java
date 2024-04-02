@@ -228,7 +228,7 @@ public class ChessClient implements MessageHandler.Whole<String> {
     private String list() throws ResponseException {
         assertLoggedIn();
         ListGamesResponse response = serverFacade.listGames();
-        return response.toString();
+        return response.toString().replaceAll("<empty>", SET_TEXT_COLOR_WHITE + "<empty>" + SET_TEXT_COLOR_BLUE);
     }
 
     private String observe(String[] params) throws ResponseException {
